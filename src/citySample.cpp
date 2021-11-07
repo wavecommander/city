@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 
 #include "../thirdparty/irrKlang/include/irrKlang.h"
 
@@ -50,7 +51,7 @@ void CitySample::init()
     printf("Successfully initialized Model Import Sample\n");
 }
 
-const int TOTAL_PERIOD = 6;
+const float TOTAL_PERIOD = 6.494;
 const float DEFAULT_VALUE = 23500.0f, TRANSLATION = -7500.0f, PULSE_WIDTH = 6.0f, SLAM_FRACTION = 0.1f;
 
 float pulse(float t) {
@@ -59,8 +60,8 @@ float pulse(float t) {
     return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
 }
 
-float thing(long time) {
-    int t = time % TOTAL_PERIOD;
+float thing(float time) {
+    int t = fmod(time, TOTAL_PERIOD);
     if (t > (TOTAL_PERIOD - PULSE_WIDTH))
         return pulse(t - TOTAL_PERIOD + PULSE_WIDTH);
     return 0;
