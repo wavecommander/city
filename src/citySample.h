@@ -23,4 +23,5 @@ private:
     OrbitCamera* m_pOrbitCam = nullptr;
     irrklang::ISoundEngine* m_pAudioEngine = nullptr;
     float m_rot = 0.0f;
+    float m_hammer = 0.0f;
 };

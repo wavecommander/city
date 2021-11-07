@@ -50,12 +50,29 @@ void CitySample::init()
     printf("Successfully initialized Model Import Sample\n");
 }
 
+const int TOTAL_PERIOD = 6;
+const float DEFAULT_VALUE = 23500.0f, TRANSLATION = -7500.0f, PULSE_WIDTH = 6.0f, SLAM_FRACTION = 0.1f;
+
+float pulse(float t) {
+    if (t < SLAM_FRACTION * PULSE_WIDTH) 
+        return DEFAULT_VALUE + TRANSLATION * t / (SLAM_FRACTION * PULSE_WIDTH);
+    return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
+}
+
+float thing(long time) {
+    int t = time % TOTAL_PERIOD;
+    if (t > (TOTAL_PERIOD - PULSE_WIDTH))
+        return pulse(t - TOTAL_PERIOD + PULSE_WIDTH);
+    return 0;
+}
+
 void CitySample::update(float dt) 
 {
     m_pOrbitCam->update(dt);
     m_pGrid->update(dt);
     m_pCitadelPiece->Update(dt);
     m_rot += dt;
+    m_hammer += dt;
 }
 
 void CitySample::render(int width, int height)
@@ -65,12 +82,15 @@ void CitySample::render(int width, int height)
 
 	glm::mat4 mProj = m_pOrbitCam->getProjMatrix(width, height);
 	glm::mat4 mView = m_pOrbitCam->getViewMatrix();
-  	glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), glm::vec3(50.0f, 100.0f, 5.0f));
+  	glm::mat4 mWorld = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    mWorld = glm::translate(glm::mat4(1.0f), glm::vec3(50.0f, 100.0f, 5.0f)) * mWorld;
 
     m_pGrid->render(mView, mProj);
     m_pCitadel->Render(mWorld, mView, mProj);
 
-	glm::mat4 mWorldPiece = glm::translate(glm::mat4(1.0f), glm::vec3(m_rot, 100.0f, 5.0f));
+	glm::mat4 mWorldPiece = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    mWorldPiece = glm::rotate(glm::mat4(1.0f), PI/2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldPiece;
+	mWorldPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, thing(m_hammer), -1000.0f)) * mWorldPiece; // Start Y = 23500.0f, End Y = 16000.0f
 
     m_pCitadelPiece->Render(mWorldPiece, mView, mProj);
 }
