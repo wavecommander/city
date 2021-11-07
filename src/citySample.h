@@ -16,6 +16,9 @@ public:
     void render(int width, int height) override;
 
 private:
+    float _calc_hammer(float time);
+    float _pulse(float t);
+
     wolf::Model* m_pCitadel = nullptr;
     wolf::Model* m_pCitadelPiece = nullptr;
     wolf::Material* m_pMat = nullptr;

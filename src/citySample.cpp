@@ -51,20 +51,24 @@ void CitySample::init()
     printf("Successfully initialized Model Import Sample\n");
 }
 
-const float TOTAL_PERIOD = 6.494;
-const float DEFAULT_VALUE = 23500.0f, TRANSLATION = -7500.0f, PULSE_WIDTH = 6.0f, SLAM_FRACTION = 0.1f;
+constexpr float TOTAL_PERIOD = 6.494,
+                PHASE_SHIFT = 1.0f,
+                DEFAULT_VALUE = 23500.0f,
+                TRANSLATION = -7500.0f,
+                PULSE_WIDTH = 6.0f,
+                SLAM_FRACTION = 0.1f;
 
-float pulse(float t) {
+float CitySample::_pulse(float t) {
     if (t < SLAM_FRACTION * PULSE_WIDTH) 
         return DEFAULT_VALUE + TRANSLATION * t / (SLAM_FRACTION * PULSE_WIDTH);
     return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
 }
 
-float thing(float time) {
-    int t = fmod(time, TOTAL_PERIOD);
+float CitySample::_calc_hammer(float time) {
+    float t = fmod(time + PHASE_SHIFT, TOTAL_PERIOD);
     if (t > (TOTAL_PERIOD - PULSE_WIDTH))
-        return pulse(t - TOTAL_PERIOD + PULSE_WIDTH);
-    return 0;
+        return _pulse(t - TOTAL_PERIOD + PULSE_WIDTH);
+    return DEFAULT_VALUE;
 }
 
 void CitySample::update(float dt) 
@@ -91,7 +95,7 @@ void CitySample::render(int width, int height)
 
 	glm::mat4 mWorldPiece = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
     mWorldPiece = glm::rotate(glm::mat4(1.0f), PI/2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldPiece;
-	mWorldPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, thing(m_hammer), -1000.0f)) * mWorldPiece; // Start Y = 23500.0f, End Y = 16000.0f
+	mWorldPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, _calc_hammer(m_hammer), -1000.0f)) * mWorldPiece; // Start Y = 23500.0f, End Y = 16000.0f
 
     m_pCitadelPiece->Render(mWorldPiece, mView, mProj);
 }
