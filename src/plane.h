@@ -8,7 +8,7 @@
 
 class Plane {
 public:
-    Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2);
+    Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     Plane(GLuint shader, uint subdivisions);
     ~Plane();
 
@@ -21,10 +21,10 @@ public:
     void setTransformMatrix(const glm::mat4 &transform_mat);
     void setColor(const glm::vec4 &color);
 
-    void setRotationSpeed1(float rot_speed);
-    void setRotationSpeed2(float rot_speed);
-    void setRotationVector1(const glm::vec3 &rot_vec);
-    void setRotationVector2(const glm::vec3 &rot_vec);
+    void setRotationSpeed1(float rotationSpeed);
+    void setRotationSpeed2(float rotationSpeed);
+    void setRotationVector1(const glm::vec3 &rotationVector);
+    void setRotationVector2(const glm::vec3 &rotationVector);
 
     glm::vec3 getPosition() const;
     float getScale() const;
@@ -40,27 +40,27 @@ public:
 private:
     static float randomFloat(float lower, float upper);
 
-    uint m_Subdivisions = 1;
+    uint m_subdivisions = 1;
 
-    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> m_vertices;
     void generateVertices();
 
-    static GLuint m_Vao, m_Vbo, m_Shader;
+    static GLuint m_vao, m_vbo, m_shader;
     void glInit(GLuint shader);
 
-    glm::vec3 m_Position = glm::vec3(0.0f,0.0f,0.0f);
-    float m_Scale = 1.0f;
-    glm::mat4 m_TransformMatrix = glm::mat4(1.0f);
+    glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
+    float m_scale = 1.0f;
+    glm::mat4 m_transformMatrix = glm::mat4(1.0f);
 
-    float m_Time = 0.0f;
+    float m_time = 0.0f;
 
-    float m_CurrentRotation = 0.0f;
-    float m_RotationSpeed1 = 1.0f;
-    float m_RotationSpeed2 = 1.0f;
-    glm::vec3 m_RotationVector1 = glm::vec3(1.0f,0.0f,0.0f);
-    glm::vec3 m_RotationVector2 = glm::vec3(0.0f,1.0f,0.0f);
+    float m_currentRotation = 0.0f;
+    float m_rotationSpeed1 = 1.0f;
+    float m_rotationSpeed2 = 1.0f;
+    glm::vec3 m_rotationVector1 = glm::vec3(1.0f,0.0f,0.0f);
+    glm::vec3 m_rotationVector2 = glm::vec3(0.0f,1.0f,0.0f);
 
-    glm::vec4 m_Color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+    glm::vec4 m_color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
 };
 
 #endif // S_PLANE_H

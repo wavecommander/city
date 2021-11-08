@@ -33,21 +33,21 @@ public:
 
 
 private:
-    static GLuint m_Vao, m_Vbo, m_Shader;
+    static GLuint m_vao, m_vbo, m_shader;
 
-    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-    float m_Scale = 1.0f;
+    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    float m_scale = 1.0f;
 
-    float m_CurrentRotation = 0.0f;
-    float m_RotationSpeed1 = 1.0f;
-    float m_RotationSpeed2 = 1.0f;
-    glm::vec3 m_RotationVector1 = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 m_RotationVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
+    float m_currentRotation = 0.0f;
+    float m_rotationSpeed1 = 1.0f;
+    float m_rotationSpeed2 = 1.0f;
+    glm::vec3 m_rotationVector1 = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 m_rotationVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::vec4 m_Color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    glm::vec4 m_color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 
-    static constexpr uint m_NUM_VERTS = 3 * 2 * 6;
-    static constexpr GLfloat m_VERTICES[] = {
+    static constexpr uint NUM_VERTS = 3 * 2 * 6;
+    static constexpr GLfloat VERTICES[] = {
 
         // Front
         -0.5f, -0.5f, 0.5f,
