@@ -11,6 +11,8 @@
 
 bool showDemoWindow = false;
 
+CitySample::CitySample(wolf::App* pApp) : Sample(pApp, "Cityscape") {}
+
 CitySample::~CitySample()
 {
 	printf("Destroying City Sample\n");
@@ -23,11 +25,25 @@ CitySample::~CitySample()
         m_pAudioEngine->drop();
 }
 
-void CitySample::pressedKey(char key) {
+void CitySample::handleKeyPress(char key) {
     switch (key)
     {
-        case 'd':
+        case '`':
+            printf("Toggling Debug Menus ... ");
             m_renderDebugUI = !m_renderDebugUI;
+            m_renderDebugUI ? printf("Enabled\n") : printf("Disabled\n");
+            break;
+        case 'w':
+            printf("W is being pressed\n");
+            break;
+        case 'a':
+            printf("A is being pressed\n");
+            break;
+        case 's':
+            printf("S is being pressed\n");
+            break;
+        case 'd':
+            printf("D is being pressed\n");
             break;
     }
 }

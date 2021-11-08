@@ -16,7 +16,7 @@ public:
     virtual void update(float dt) = 0;
     virtual void render(int width, int height) = 0;
 
-    virtual void pressedKey(char key) = 0;
+    virtual void handleKeyPress(char key) = 0;
     virtual void goToSleep() = 0;
 
 protected:

@@ -8,9 +8,10 @@ constexpr GLfloat Cube::VERTICES[];
 
 GLuint Cube::m_vao = 0, Cube::m_vbo = 0, Cube::m_shader = 0;
 
-Cube::Cube(GLuint m_shader, glm::vec3 pos, float scale, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2)
-    : m_position(pos)
+Cube::Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2)
+    : m_position(position)
     , m_scale(scale)
+    , m_transformMatrix(transformMatrix)
     , m_color(color)
     , m_rotationSpeed1(rotationSpeed1)
     , m_rotationSpeed2(rotationSpeed2)
@@ -62,7 +63,7 @@ void Cube::render(int width, int height, const glm::mat4 &mProj, const glm::mat4
 	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed1, m_rotationVector1);
 	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed2, m_rotationVector2);
     glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale, m_scale, m_scale));
-	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale;
+	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * m_transformMatrix;
 	
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
 
@@ -99,6 +100,11 @@ void Cube::setScale(float scale)
     m_scale = scale;
 }
 
+void Cube::setTransformMatrix(const glm::mat4 &transformMatrix)
+{
+    this->m_transformMatrix = transformMatrix;
+}
+
 void Cube::setColor(const glm::vec4 &color)
 {
     m_color = color;
@@ -132,6 +138,11 @@ glm::vec3 Cube::getPosition() const
 float Cube::getScale() const
 {
     return m_scale;
+}
+
+glm::mat4 Cube::getTransformMatrix() const
+{
+    return m_transformMatrix;
 }
 
 glm::vec4 Cube::getColor() const

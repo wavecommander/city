@@ -17,8 +17,9 @@ public:
     void switchToSampleNumber(int num);
     void switchToSampleWithName(const std::string& name);
     void nextSample();
+    void switchToLastSample();
 
-    void pressedKey(char key);
+    void handleKeyPress(char key);
 
 private:
     void _sampleChanged();

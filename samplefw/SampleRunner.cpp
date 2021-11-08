@@ -76,8 +76,12 @@ void SampleRunner::nextSample()
     _sampleChanged();
 }
 
-void SampleRunner::pressedKey(char key) {
-    m_pCurrSample->pressedKey(key);
+void SampleRunner::switchToLastSample() {
+    switchToSampleNumber(m_samples.size() -1);
+}
+
+void SampleRunner::handleKeyPress(char key) {
+    m_pCurrSample->handleKeyPress(key);
 }
 
 void SampleRunner::_sampleChanged() 

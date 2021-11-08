@@ -11,14 +11,14 @@
 class CitySample: public Sample
 {
 public:
-    CitySample(wolf::App* pApp) : Sample(pApp, "Cityscape") {}
+    CitySample(wolf::App* pApp);
     ~CitySample();
 
     void init() override;
     void update(float dt) override;
     void render(int width, int height) override;
 
-    void pressedKey(char key) override;
+    void handleKeyPress(char key) override;
     void goToSleep() override;
 
 private:

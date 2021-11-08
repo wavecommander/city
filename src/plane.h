@@ -8,7 +8,7 @@
 
 class Plane {
 public:
-    Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
+    Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     Plane(GLuint shader, uint subdivisions);
     ~Plane();
 
@@ -18,7 +18,7 @@ public:
 
     void setPosition(const glm::vec3 &position);
     void setScale(float scale);
-    void setTransformMatrix(const glm::mat4 &transform_mat);
+    void setTransformMatrix(const glm::mat4 &transformMatrix);
     void setColor(const glm::vec4 &color);
 
     void setRotationSpeed1(float rotationSpeed);

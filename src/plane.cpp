@@ -6,16 +6,16 @@
 
 GLuint Plane::m_vao = 0, Plane::m_vbo = 0, Plane::m_shader = 0;
 
-Plane::Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2)
+Plane::Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2)
     : m_subdivisions(subdivisions)
     , m_position(position)
     , m_scale(scale)
-    , m_transformMatrix(transform_mat)
+    , m_transformMatrix(transformMatrix)
     , m_color(color)
-    , m_rotationSpeed1(rot_speed1)
-    , m_rotationSpeed2(rot_speed2)
-    , m_rotationVector1(rot_vec1)
-    , m_rotationVector2(rot_vec2)
+    , m_rotationSpeed1(rotationSpeed1)
+    , m_rotationSpeed2(rotationSpeed2)
+    , m_rotationVector1(rotationVector1)
+    , m_rotationVector2(rotationVector2)
 {
     generateVertices();
 
@@ -64,7 +64,7 @@ void Plane::generateVertices() {
 }
 
 void Plane::glInit(GLuint shader) {
-    this->m_shader = shader;
+    m_shader = shader;
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -151,9 +151,9 @@ void Plane::setScale(float scale)
     this->m_scale = scale;
 }
 
-void Plane::setTransformMatrix(const glm::mat4 &transform_mat)
+void Plane::setTransformMatrix(const glm::mat4 &transformMatrix)
 {
-    this->m_transformMatrix = transform_mat;
+    this->m_transformMatrix = transformMatrix;
 }
 
 void Plane::setColor(const glm::vec4 &color)

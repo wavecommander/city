@@ -6,7 +6,7 @@
 
 class Cube {
 public:
-    Cube(GLuint shader, glm::vec3 position, float scale, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
+    Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     ~Cube();
 
     void render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const;
@@ -15,6 +15,7 @@ public:
 
     void setPosition(const glm::vec3 &position);
     void setScale(float scale);
+    void setTransformMatrix(const glm::mat4 &transformMatrix);
     void setColor(const glm::vec4 &color);
 
     void setRotationSpeed1(float rotationSpeed);
@@ -24,6 +25,7 @@ public:
 
     glm::vec3 getPosition() const;
     float getScale() const;
+    glm::mat4 getTransformMatrix() const;
     glm::vec4 getColor() const;
 
     float getRotationSpeed1() const;
@@ -37,6 +39,7 @@ private:
 
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
     float m_scale = 1.0f;
+    glm::mat4 m_transformMatrix = glm::mat4(1.0f);
 
     float m_currentRotation = 0.0f;
     float m_rotationSpeed1 = 1.0f;

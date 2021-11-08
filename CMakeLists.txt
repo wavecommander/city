@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(sample VERSION 0.1.0)
+project(city VERSION 1.0.0)
 
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
@@ -92,7 +92,7 @@ file(GLOB_RECURSE HEADER_FILES
 	${CMAKE_SOURCE_DIR}/src/*.h
     ${CMAKE_SOURCE_DIR}/src/*.hpp)
 
-add_executable(sample 
+add_executable(city 
     ${SAMPLEFW_SOURCE_FILES}
     ${SAMPLEFW_HEADER_FILES}
     ${WOLF_SOURCE_FILES}
@@ -101,23 +101,24 @@ add_executable(sample
     ${HEADER_FILES}
     )
 
+# Linking dynamic/shared library for irrKlang 2D/3D Audio Engine
 if (WIN32)
-    target_link_libraries(sample
+    target_link_libraries(city
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/winx64-visualStudio/irrKlang.dll
     )
 endif ()
 if (APPLE)
-    target_link_libraries(sample
+    target_link_libraries(city
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/macosx-gcc/libirrklang.dylib
     )
 endif ()
 if (NOT WIN32 AND NOT APPLE)
-    target_link_libraries(sample
+    target_link_libraries(city
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/linux-gcc-64/libIrrKlang.so
     )
 endif ()
 
-target_link_libraries(sample assimp glfw glew ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
+target_link_libraries(city assimp glfw glew ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
