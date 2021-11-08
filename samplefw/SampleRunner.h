@@ -18,6 +18,8 @@ public:
     void switchToSampleWithName(const std::string& name);
     void nextSample();
 
+    void pressedKey(char key);
+
 private:
     void _sampleChanged();
 

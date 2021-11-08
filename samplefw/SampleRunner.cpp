@@ -70,9 +70,14 @@ void SampleRunner::switchToSampleWithName(const std::string& name)
 
 void SampleRunner::nextSample()
 {
+    m_pCurrSample->goToSleep();
     m_currSampleNumber = (m_currSampleNumber + 1) % m_samples.size();
     m_pCurrSample = m_samples[m_currSampleNumber];
     _sampleChanged();
+}
+
+void SampleRunner::pressedKey(char key) {
+    m_pCurrSample->pressedKey(key);
 }
 
 void SampleRunner::_sampleChanged() 
