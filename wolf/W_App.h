@@ -24,6 +24,8 @@ namespace wolf
         glm::vec2 getScreenSize() const;
         glm::vec2 getMouseScroll() const { return m_mouseScroll; }
 
+        GLFWwindow* getWindow() const { return m_pWindow; }
+
         // Used internally but needs to be public
         void _setMouseScroll(const glm::vec2 &scroll);
 

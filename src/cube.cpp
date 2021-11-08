@@ -4,33 +4,33 @@
 #include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
 
-constexpr GLfloat Cube::vertices[];
+constexpr GLfloat Cube::m_VERTICES[];
 
-GLuint Cube::vao = 0, Cube::vbo = 0, Cube::shader = 0;
+GLuint Cube::m_Vao = 0, Cube::m_Vbo = 0, Cube::m_Shader = 0;
 
-Cube::Cube(GLuint shader, glm::vec3 pos, float scale, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2)
-    : pos(pos)
-    , scale(scale)
-    , color(color)
-    , rot_speed1(rot_speed1)
-    , rot_speed2(rot_speed2)
-    , rot_vec1(rot_vec1)
-    , rot_vec2(rot_vec2)
+Cube::Cube(GLuint m_Shader, glm::vec3 pos, float scale, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2)
+    : m_Position(pos)
+    , m_Scale(scale)
+    , m_Color(color)
+    , m_RotationSpeed1(rotationSpeed1)
+    , m_RotationSpeed2(rotationSpeed2)
+    , m_RotationVector1(rotationVector1)
+    , m_RotationVector2(rotationVector2)
 {
 
-    if(!vao) {
-        this->shader = shader;
+    if(!m_Vao) {
+        this->m_Shader = m_Shader;
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        glGenVertexArrays(1, &m_Vao);
+        glBindVertexArray(m_Vao);
 
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * NUM_VERTS * 3, vertices, GL_STATIC_DRAW);
+        glGenBuffers(1, &m_Vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * m_NUM_VERTS * 3, m_VERTICES, GL_STATIC_DRAW);
 
-        int posAttr = glGetAttribLocation(shader, "a_position");
+        int posAttr = glGetAttribLocation(m_Shader, "a_position");
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
         glVertexAttribPointer(posAttr,  // Attribute location
                             3,          // Number of components
                             GL_FLOAT,   // Type of each component
@@ -43,118 +43,118 @@ Cube::Cube(GLuint shader, glm::vec3 pos, float scale, glm::vec4 color, float rot
 
 Cube::~Cube()
 {
-    if(vao) {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        vao = 0;
-        vbo = 0;
+    if(m_Vao) {
+        glDeleteVertexArrays(1, &m_Vao);
+        glDeleteBuffers(1, &m_Vbo);
+        m_Vao = 0;
+        m_Vbo = 0;
     }
 }
 
 void Cube::update(float dt)
 {
-    cur_rot += dt;
+    m_CurrentRotation += dt;
 }
 
 void Cube::render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const
 {
-    glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), pos);
-	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), cur_rot * rot_speed1, rot_vec1);
-	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), cur_rot * rot_speed2, rot_vec2);
-    glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(scale, scale, scale));
+    glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), m_Position);
+	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), m_CurrentRotation * m_RotationSpeed1, m_RotationVector1);
+	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), m_CurrentRotation * m_RotationSpeed2, m_RotationVector2);
+    glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(m_Scale, m_Scale, m_Scale));
 	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale;
 	
-    glUniformMatrix4fv(glGetUniformLocation(shader, "world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
+    glUniformMatrix4fv(glGetUniformLocation(m_Shader, "u_world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
 
-    glUniform4f(glGetUniformLocation(shader, "c_color"), color.x, color.y, color.z, color.w);
+    glUniform4f(glGetUniformLocation(m_Shader, "u_color"), m_Color.x, m_Color.y, m_Color.z, m_Color.w);
 
-    glBindVertexArray(vao);
+    glBindVertexArray(m_Vao);
 
-	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
+	glDrawArrays(GL_TRIANGLES, 0, m_NUM_VERTS);
 }
 
-std::string Cube::to_string(uint id) const
+std::string Cube::toString(uint id) const
 {
     std::ostringstream out;
     out.precision(4);
 
-    out << "Cube" << id << ": Pos:X" << pos.x << ",Y" << pos.y << ",Z" << pos.z
-    << "; Scale:" << scale
-    << "; Current Rotation:" << cur_rot
-    << "; Rotation Vector 1:X" << rot_vec1.x << ",Y" << rot_vec1.y << ",Z" << rot_vec1.z
-    << "; Rotation Vector 2:X" << rot_vec2.x << ",Y" << rot_vec2.y << ",Z" << rot_vec2.z
-    << "; Color:R" << color.r << ",G" << color.g << ",B" << color.b
+    out << "Cube" << id << ": Pos:X" << m_Position.x << ",Y" << m_Position.y << ",Z" << m_Position.z
+        << "; Scale:" << m_Scale
+        << "; Current Rotation:" << m_CurrentRotation
+        << "; Rotation Vector 1:X" << m_RotationVector1.x << ",Y" << m_RotationVector1.y << ",Z" << m_RotationVector1.z
+        << "; Rotation Vector 2:X" << m_RotationVector2.x << ",Y" << m_RotationVector2.y << ",Z" << m_RotationVector2.z
+        << "; Color:R" << m_Color.r << ",G" << m_Color.g << ",B" << m_Color.b
     << "\n";
 
     return out.str();
 }
 
-void Cube::set_position(const glm::vec3 &pos)
+void Cube::setPosition(const glm::vec3 &position)
 {
-    this->pos = pos;
+    this->m_Position = position;
 }
 
-void Cube::set_scale(float scale)
+void Cube::setScale(float scale)
 {
-    this->scale = scale;
+    this->m_Scale = scale;
 }
 
-void Cube::set_color(const glm::vec4 &color)
+void Cube::setColor(const glm::vec4 &color)
 {
-    this->color = color;
+    this->m_Color = color;
 }
 
-void Cube::set_rotation_speed_1(float rot_speed)
+void Cube::setRotationSpeed1(float rotationSpeed)
 {
-    this->rot_speed1 = rot_speed;
+    this->m_RotationSpeed1 = rot_speed;
 }
 
-void Cube::set_rotation_speed_2(float rot_speed)
+void Cube::setRotationSpeed2(float rotationSpeed)
 {
-    this->rot_speed2 = rot_speed;
+    this->m_RotationSpeed2 = rot_speed;
 }
 
-void Cube::set_rotation_vector_1(const glm::vec3 &rot_vec)
+void Cube::setRotationVector1(const glm::vec3 &rotationVector)
 {
-    this->rot_vec1 = rot_vec;
+    this->m_RotationVector1 = rot_vec;
 }
 
-void Cube::set_rotation_vector_2(const glm::vec3 &rot_vec)
+void Cube::setRotationVector2(const glm::vec3 &rotationVector)
 {
-    this->rot_vec2 = rot_vec;
+    this->m_RotationVector2 = rot_vec;
 }
 
-glm::vec3 Cube::get_position() const
+glm::vec3 Cube::getPosition() const
 {
-    return pos;
+    return m_Position;
 }
 
-float Cube::get_scale() const
+float Cube::getScale() const
 {
-    return scale;
+    return m_Scale;
 }
 
-glm::vec4 Cube::get_color() const
+glm::vec4 Cube::getColor() const
 {
-    return color;
+    return m_Color;
 }
 
-float Cube::get_rotation_speed_1() const
+float Cube::getRotationSpeed1() const
 {
-    return rot_speed1;
+    return m_RotationSpeed1;
 }
 
-float Cube::get_rotation_speed_2() const
+float Cube::getRotationSpeed2() const
 {
-    return rot_speed2;
+    return m_RotationSpeed2;
 }
 
-glm::vec3 Cube::get_rotation_vector_1() const
+glm::vec3 Cube::getRotationVector1() const
 {
-    return rot_vec1;
+    return m_RotationVector1;
 }
 
-glm::vec3 Cube::get_rotation_vector_2() const
+glm::vec3 Cube::getRotationVector2() const
 {
-    return rot_vec2;
+    return m_RotationVector2;
 }

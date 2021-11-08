@@ -6,48 +6,48 @@
 
 class Cube {
 public:
-    Cube(GLuint shader, glm::vec3 pos, float scale, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2);
+    Cube(GLuint shader, glm::vec3 position, float scale, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     ~Cube();
 
     void render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const;
     void update(float dt);
-    std::string to_string(uint id) const;
+    std::string toString(uint id) const;
 
-    void set_position(const glm::vec3 &pos);
-    void set_scale(float scale);
-    void set_color(const glm::vec4 &color);
+    void setPosition(const glm::vec3 &position);
+    void setScale(float scale);
+    void setColor(const glm::vec4 &color);
 
-    void set_rotation_speed_1(float rot_speed);
-    void set_rotation_speed_2(float rot_speed);
-    void set_rotation_vector_1(const glm::vec3 &rot_vec);
-    void set_rotation_vector_2(const glm::vec3 &rot_vec);
+    void setRotationSpeed1(float rotationSpeed);
+    void setRotationSpeed2(float rotationSpeed);
+    void setRotationVector1(const glm::vec3 &rotationVector);
+    void setRotationVector2(const glm::vec3 &rotationVector);
 
-    glm::vec3 get_position() const;
-    float get_scale() const;
-    glm::vec4 get_color() const;
+    glm::vec3 getPosition() const;
+    float getScale() const;
+    glm::vec4 getColor() const;
 
-    float get_rotation_speed_1() const;
-    float get_rotation_speed_2() const;
-    glm::vec3 get_rotation_vector_1() const;
-    glm::vec3 get_rotation_vector_2() const;
+    float getRotationSpeed1() const;
+    float getRotationSpeed2() const;
+    glm::vec3 getRotationVector1() const;
+    glm::vec3 getRotationVector2() const;
 
 
 private:
-    static GLuint vao, vbo, shader;
+    static GLuint m_Vao, m_Vbo, m_Shader;
 
-    glm::vec3 pos = glm::vec3(0.0f,0.0f,0.0f);
-    float scale = 1.0f;
+    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
+    float m_Scale = 1.0f;
 
-    float cur_rot = 0.0f;
-    float rot_speed1 = 1.0f;
-    float rot_speed2 = 1.0f;
-    glm::vec3 rot_vec1 = glm::vec3(1.0f,0.0f,0.0f);
-    glm::vec3 rot_vec2 = glm::vec3(0.0f,1.0f,0.0f);
+    float m_CurrentRotation = 0.0f;
+    float m_RotationSpeed1 = 1.0f;
+    float m_RotationSpeed2 = 1.0f;
+    glm::vec3 m_RotationVector1 = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 m_RotationVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::vec4 color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+    glm::vec4 m_Color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 
-    static constexpr uint NUM_VERTS = 3 * 2 * 6;
-    static constexpr GLfloat vertices[] = {
+    static constexpr uint m_NUM_VERTS = 3 * 2 * 6;
+    static constexpr GLfloat m_VERTICES[] = {
 
         // Front
         -0.5f, -0.5f, 0.5f,

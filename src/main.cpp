@@ -25,7 +25,7 @@ public:
         }
         else if(m_lastDown)
         {
-            m_sampleRunner.nextSample();
+            // m_sampleRunner.nextSample();
             m_lastDown = false;
         }
 

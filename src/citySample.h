@@ -4,11 +4,12 @@
 #include "../samplefw/Sample.h"
 #include "../samplefw/Grid3D.h"
 #include "../samplefw/OrbitCamera.h"
+#include "plane.h"
 
 class CitySample: public Sample
 {
 public:
-    CitySample(wolf::App* pApp) : Sample(pApp,"Alpha Test") {}
+    CitySample(wolf::App* pApp) : Sample(pApp,"Cityscape") {}
     ~CitySample();
 
     void init() override;
@@ -24,7 +25,11 @@ private:
     wolf::Material* m_pMat = nullptr;
     Grid3D* m_pGrid = nullptr;
     OrbitCamera* m_pOrbitCam = nullptr;
+
+    Plane *m_pCityGrid = nullptr;
+
     irrklang::ISoundEngine* m_pAudioEngine = nullptr;
+
     float m_rot = 0.0f;
     float m_hammer = 0.0f;
 };

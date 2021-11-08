@@ -4,80 +4,78 @@
 #include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
 
-GLuint Plane::vao = 0, Plane::vbo = 0, Plane::shader = 0;
+GLuint Plane::m_Vao = 0, Plane::m_Vbo = 0, Plane::m_Shader = 0;
 
-Plane::Plane(GLuint shader, uint subdivision, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2)
-    : subdivisions(subdivisions)
-    , position(position)
-    , scale(scale)
-    , transform_mat(transform_mat)
-    , color(color)
-    , rot_speed1(rot_speed1)
-    , rot_speed2(rot_speed2)
-    , rot_vec1(rot_vec1)
-    , rot_vec2(rot_vec2)
+Plane::Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transform_mat, glm::vec4 color, float rot_speed1, float rot_speed2, glm::vec3 rot_vec1, glm::vec3 rot_vec2)
+    : m_Subdivisions(subdivisions)
+    , m_Position(position)
+    , m_Scale(scale)
+    , m_TransformMatrix(transform_mat)
+    , m_Color(color)
+    , m_RotationSpeed1(rot_speed1)
+    , m_RotationSpeed2(rot_speed2)
+    , m_RotationVector1(rot_vec1)
+    , m_RotationVector2(rot_vec2)
 {
-    generate_vertices();
+    generateVertices();
 
-    if(!vao) {
-        gl_init(shader);
+    if(!m_Vao) {
+        glInit(shader);
     }
 }
 
-Plane::Plane(GLuint shader, uint subdivisions) {
-    this->subdivisions = subdivisions;
+Plane::Plane(GLuint shader, uint subdivisions) : m_Subdivisions(subdivisions) {
+    generateVertices();
 
-    generate_vertices();
-
-    if(!vao) {
-        gl_init(shader);
+    if(!m_Vao) {
+        glInit(shader);
     }
 
-    position = glm::vec3(0.0f, 1.0f, 0.0f);
-	scale = rand_f(1.0f,5.0f);
-	color = glm::vec4(rand_f(0.0f,1.0f), rand_f(0.0f,1.0f), rand_f(0.0f,1.0f), 1.0f);
+    m_Position = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_Scale = randomFloat(1.0f,5.0f);
+	m_Color = glm::vec4(randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), 1.0f);
 
-	rot_speed1 = 0.0f;
-	rot_speed2 = 0.0f;
-	rot_vec1 = glm::vec3(rand_f(-1.0f,1.0f), rand_f(-1.0f,1.0f), rand_f(-1.0f,1.0f));
-	rot_vec2 = glm::vec3(rand_f(-1.0f,1.0f), rand_f(-1.0f,1.0f), rand_f(-1.0f,1.0f));
+	m_RotationSpeed1 = 0.0f;
+	m_RotationSpeed2 = 0.0f;
+	m_RotationVector1 = glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f));
+	m_RotationVector2 = glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f));
 }
 
-void Plane::generate_vertices() {
-    int num_squares = pow(4, (subdivisions - 1));
-    int rows_cols = sqrt(num_squares);
-    int half = rows_cols / 2;
-    float side_len = 0.99;
+void Plane::generateVertices() {
+    int numSquares = pow(4, (m_Subdivisions - 1));
+    int rowsCols = sqrt(numSquares);
+    int half = rowsCols / 2;
+    float sideLen = 0.99;
 
     for(int i = -half; i < half; ++i) {
-        float anchor_z = i;
+        float anchorZ = i;
 
         for(int j = -half; j < half; ++j) {
-            float anchor_x = j;
+            float anchorX = j;
 
-            vertices.insert(vertices.cend(), {anchor_x, 0.0f, anchor_z});
-            vertices.insert(vertices.cend(), {anchor_x + side_len, 0.0f, anchor_z});
-            vertices.insert(vertices.cend(), {anchor_x + side_len, 0.0f, anchor_z + side_len});
-            vertices.insert(vertices.cend(), {anchor_x + side_len, 0.0f, anchor_z + side_len});
-            vertices.insert(vertices.cend(), {anchor_x, 0.0f, anchor_z + side_len});
-            vertices.insert(vertices.cend(), {anchor_x, 0.0f, anchor_z});
+            vertices.insert(vertices.cend(), {anchorX, 0.0f, anchorZ});
+            vertices.insert(vertices.cend(), {anchorX + sideLen, 0.0f, anchorZ});
+            vertices.insert(vertices.cend(), {anchorX + sideLen, 0.0f, anchorZ + sideLen});
+            vertices.insert(vertices.cend(), {anchorX + sideLen, 0.0f, anchorZ + sideLen});
+            vertices.insert(vertices.cend(), {anchorX, 0.0f, anchorZ + sideLen});
+            vertices.insert(vertices.cend(), {anchorX, 0.0f, anchorZ});
         }
     }
 }
 
-void Plane::gl_init(GLuint shader) {
-    this->shader = shader;
+void Plane::glInit(GLuint shader) {
+    this->m_Shader = shader;
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &m_Vao);
+    glBindVertexArray(m_Vao);
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &m_Vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
     int posAttr = glGetAttribLocation(shader, "a_position");
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
     glVertexAttribPointer(posAttr,  // Attribute location
                           3,        // Number of components
                           GL_FLOAT, // Type of each component
@@ -89,40 +87,40 @@ void Plane::gl_init(GLuint shader) {
 
 Plane::~Plane()
 {
-    if(vao) {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        vao = 0;
-        vbo = 0;
+    if(m_Vao) {
+        glDeleteVertexArrays(1, &m_Vao);
+        glDeleteBuffers(1, &m_Vbo);
+        m_Vao = 0;
+        m_Vbo = 0;
     }
 }
 
-float Plane::rand_f(float lower, float upper)
+float Plane::randomFloat(float lower, float upper)
 {
 	return lower + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(upper-lower)));
 }
 
 void Plane::update(float dt)
 {
-    cur_rot += dt;
-    time += dt;
+    m_CurrentRotation += dt;
+    m_Time += dt;
 }
 
 void Plane::render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const
 {
-    glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), position);
-	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), cur_rot * rot_speed1, rot_vec1);
-	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), cur_rot * rot_speed2, rot_vec2);
-    glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(scale, scale, scale));
-	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * transform_mat;
+    glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), m_Position);
+	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), m_CurrentRotation * m_RotationSpeed1, m_RotationVector1);
+	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), m_CurrentRotation * m_RotationSpeed2, m_RotationVector2);
+    glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(m_Scale, m_Scale, m_Scale));
+	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * m_TransformMatrix;
 
-    glUniformMatrix4fv(glGetUniformLocation(shader, "world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
+    glUniformMatrix4fv(glGetUniformLocation(m_Shader, "u_world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
 
-    glUniform1f(glGetUniformLocation(shader, "u_time"), time);
+    glUniform1f(glGetUniformLocation(m_Shader, "u_time"), m_Time);
 
-    glUniform4f(glGetUniformLocation(shader, "c_color"), color.r, color.g, color.b, color.a);
+    glUniform4f(glGetUniformLocation(m_Shader, "u_color"), m_Color.r, m_Color.g, m_Color.b, m_Color.a);
 
-    glBindVertexArray(vao);
+    glBindVertexArray(m_Vao);
 
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
 }
@@ -132,93 +130,93 @@ std::string Plane::to_string(uint id) const
     std::ostringstream out;
     out.precision(4);
 
-    out << "Plane" << id << ": Pos:X" << position.x << ",Y" << position.y << ",Z" << position.z
-    << "; Scale:" << scale
-    << "; Current Rotation:" << cur_rot
-    << "; Rotation Vector 1:X" << rot_vec1.x << ",Y" << rot_vec1.y << ",Z" << rot_vec1.z
-    << "; Rotation Vector 2:X" << rot_vec2.x << ",Y" << rot_vec2.y << ",Z" << rot_vec2.z
-    << "; Color:R" << color.r << ",G" << color.g << ",B" << color.b
+    out << "Plane" << id << ": Pos:X" << m_Position.x << ",Y" << m_Position.y << ",Z" << m_Position.z
+    << "; Scale:" << m_Scale
+    << "; Current Rotation:" << m_CurrentRotation
+    << "; Rotation Vector 1:X" << m_RotationVector1.x << ",Y" << m_RotationVector1.y << ",Z" << m_RotationVector1.z
+    << "; Rotation Vector 2:X" << m_RotationVector2.x << ",Y" << m_RotationVector2.y << ",Z" << m_RotationVector2.z
+    << "; Color:R" << m_Color.r << ",G" << m_Color.g << ",B" << m_Color.b
     << "\n";
 
     return out.str();
 }
 
-void Plane::set_position(const glm::vec3 &position)
+void Plane::setPosition(const glm::vec3 &position)
 {
-    this->position = position;
+    this->m_Position = position;
 }
 
-void Plane::set_scale(float scale)
+void Plane::setScale(float scale)
 {
-    this->scale = scale;
+    this->m_Scale = scale;
 }
 
-void Plane::set_transform_mat(const glm::mat4 &transform_mat)
+void Plane::setTransformMatrix(const glm::mat4 &transform_mat)
 {
-    this->transform_mat = transform_mat;
+    this->m_TransformMatrix = transform_mat;
 }
 
-void Plane::set_color(const glm::vec4 &color)
+void Plane::setColor(const glm::vec4 &color)
 {
-    this->color = color;
+    this->m_Color = color;
 }
 
-void Plane::set_rotation_speed_1(float rot_speed)
+void Plane::setRotationSpeed1(float rot_speed)
 {
-    this->rot_speed1 = rot_speed;
+    this->m_RotationSpeed1 = rot_speed;
 }
 
-void Plane::set_rotation_speed_2(float rot_speed)
+void Plane::setRotationSpeed2(float rot_speed)
 {
-    this->rot_speed2 = rot_speed;
+    this->m_RotationSpeed2 = rot_speed;
 }
 
-void Plane::set_rotation_vector_1(const glm::vec3 &rot_vec)
+void Plane::setRotationVector1(const glm::vec3 &rot_vec)
 {
-    this->rot_vec1 = rot_vec;
+    this->m_RotationVector1 = rot_vec;
 }
 
-void Plane::set_rotation_vector_2(const glm::vec3 &rot_vec)
+void Plane::setRotationVector2(const glm::vec3 &rot_vec)
 {
-    this->rot_vec2 = rot_vec;
+    this->m_RotationVector2 = rot_vec;
 }
 
-glm::vec3 Plane::get_position() const
+glm::vec3 Plane::getPosition() const
 {
-    return position;
+    return m_Position;
 }
 
-float Plane::get_scale() const
+float Plane::getScale() const
 {
-    return scale;
+    return m_Scale;
 }
 
-glm::mat4 Plane::get_transform_mat() const
+glm::mat4 Plane::getTransformMatrix() const
 {
-    return transform_mat;
+    return m_TransformMatrix;
 }
 
-glm::vec4 Plane::get_color() const
+glm::vec4 Plane::getColor() const
 {
-    return color;
+    return m_Color;
 }
 
-float Plane::get_rotation_speed_1() const
+float Plane::getRotationSpeed1() const
 {
-    return rot_speed1;
+    return m_RotationSpeed1;
 }
 
-float Plane::get_rotation_speed_2() const
+float Plane::getRotationSpeed2() const
 {
-    return rot_speed2;
+    return m_RotationSpeed2;
 }
 
-glm::vec3 Plane::get_rotation_vector_1() const
+glm::vec3 Plane::getRotationVector1() const
 {
-    return rot_vec1;
+    return m_RotationVector1;
 }
 
-glm::vec3 Plane::get_rotation_vector_2() const
+glm::vec3 Plane::getRotationVector2() const
 {
-    return rot_vec2;
+    return m_RotationVector2;
 }
