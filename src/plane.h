@@ -14,7 +14,7 @@ public:
 
     void render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const;
     void update(float dt);
-    std::string to_string(uint id) const;
+    std::string toString(uint id) const;
 
     void setPosition(const glm::vec3 &position);
     void setScale(float scale);
@@ -38,15 +38,13 @@ public:
 
 
 private:
-    static float randomFloat(float lower, float upper);
-
     uint m_subdivisions = 1;
 
     std::vector<GLfloat> m_vertices;
-    void generateVertices();
+    void _generateVertices();
 
     static GLuint m_vao, m_vbo, m_shader;
-    void glInit(GLuint shader);
+    void _glInit(GLuint shader);
 
     glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
     float m_scale = 1.0f;

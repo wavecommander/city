@@ -34,12 +34,17 @@ private:
 
     wolf::Model* m_pCitadel = nullptr;
     wolf::Model* m_pCitadelPiece = nullptr;
+
     wolf::Material* m_pMat = nullptr;
+    wolf::Program* m_pProgram = nullptr;
+
+    GLuint m_shader = 0;
+
     Grid3D* m_pGrid = nullptr;
     OrbitCamera* m_pOrbitCam = nullptr;
     irrklang::ISoundEngine* m_pAudioEngine = nullptr;
 
-    Plane *m_pCityGrid = nullptr;
+    Plane *m_pPlane = nullptr;
 
     ImVec4 m_clearColor = ImVec4(0.0,0.0,0.0,0.0);
 };

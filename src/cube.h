@@ -7,6 +7,7 @@
 class Cube {
 public:
     Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
+    Cube(GLuint shader);
     ~Cube();
 
     void render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const;
@@ -36,6 +37,7 @@ public:
 
 private:
     static GLuint m_vao, m_vbo, m_shader;
+    void _glInit(GLuint shader);
 
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
     float m_scale = 1.0f;

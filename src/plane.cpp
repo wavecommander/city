@@ -1,8 +1,9 @@
 #include <sstream>
 
-#include "plane.h"
 #include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
+#include "plane.h"
+#include "utils.h"
 
 GLuint Plane::m_vao = 0, Plane::m_vbo = 0, Plane::m_shader = 0;
 
@@ -17,31 +18,31 @@ Plane::Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, 
     , m_rotationVector1(rotationVector1)
     , m_rotationVector2(rotationVector2)
 {
-    generateVertices();
+    _generateVertices();
 
     if(!m_vao) {
-        glInit(shader);
+        _glInit(shader);
     }
 }
 
-Plane::Plane(GLuint shader, uint subdivisions) : m_subdivisions(subdivisions) {
-    generateVertices();
+Plane::Plane(GLuint shader, uint subdivisions)
+    : m_subdivisions(subdivisions)
+    , m_position(glm::vec3(0.0f, 0.0f, 0.0f))
+    , m_scale(randomFloat(1.0f,5.0f))
+    , m_color(glm::vec4(randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), 1.0f))
+    , m_rotationSpeed1(0.0f)
+    , m_rotationSpeed2(0.0f)
+    , m_rotationVector1(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
+    , m_rotationVector2(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
+ {
+    _generateVertices();
 
     if(!m_vao) {
-        glInit(shader);
+        _glInit(shader);
     }
-
-    m_position = glm::vec3(0.0f, 1.0f, 0.0f);
-	m_scale = randomFloat(1.0f,5.0f);
-	m_color = glm::vec4(randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), 1.0f);
-
-	m_rotationSpeed1 = 0.0f;
-	m_rotationSpeed2 = 0.0f;
-	m_rotationVector1 = glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f));
-	m_rotationVector2 = glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f));
 }
 
-void Plane::generateVertices() {
+void Plane::_generateVertices() {
     int numSquares = pow(4, (m_subdivisions - 1));
     int rowsCols = sqrt(numSquares);
     int half = rowsCols / 2;
@@ -63,7 +64,7 @@ void Plane::generateVertices() {
     }
 }
 
-void Plane::glInit(GLuint shader) {
+void Plane::_glInit(GLuint shader) {
     m_shader = shader;
 
     glGenVertexArrays(1, &m_vao);
@@ -95,11 +96,6 @@ Plane::~Plane()
     }
 }
 
-float Plane::randomFloat(float lower, float upper)
-{
-	return lower + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(upper-lower)));
-}
-
 void Plane::update(float dt)
 {
     m_currentRotation += dt;
@@ -114,6 +110,8 @@ void Plane::render(int width, int height, const glm::mat4 &mProj, const glm::mat
     glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale, m_scale, m_scale));
 	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * m_transformMatrix;
 
+    glUseProgram(m_shader);
+
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
 
     glUniform1f(glGetUniformLocation(m_shader, "u_time"), m_time);
@@ -125,7 +123,7 @@ void Plane::render(int width, int height, const glm::mat4 &mProj, const glm::mat
 	glDrawArrays(GL_TRIANGLES, 0, m_vertices.size() / 3);
 }
 
-std::string Plane::to_string(uint id) const
+std::string Plane::toString(uint id) const
 {
     std::ostringstream out;
     out.precision(4);

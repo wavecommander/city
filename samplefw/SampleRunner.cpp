@@ -46,6 +46,7 @@ void SampleRunner::addSample(Sample* pSample)
 
 void SampleRunner::switchToSampleNumber(int num)
 {
+    m_pCurrSample->goToSleep();
     if(num < m_samples.size())
     {
         m_pCurrSample = m_samples[num];
@@ -60,6 +61,7 @@ void SampleRunner::switchToSampleWithName(const std::string& name)
     {
         if(m_samples[i]->getName() == name)
         {
+            m_pCurrSample->goToSleep();
             m_pCurrSample = m_samples[i];
             m_currSampleNumber = i;
             _sampleChanged();

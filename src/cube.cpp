@@ -1,8 +1,9 @@
 #include <sstream>
 
-#include "cube.h"
 #include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
+#include "cube.h"
+#include "utils.h"
 
 constexpr GLfloat Cube::VERTICES[];
 
@@ -18,9 +19,22 @@ Cube::Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMa
     , m_rotationVector1(rotationVector1)
     , m_rotationVector2(rotationVector2)
 {
+    if(!m_vao)
+        _glInit(shader);
+}
 
-    if(!m_vao) {
-        this->m_shader = m_shader;
+Cube::Cube(GLuint shader)
+    : m_position(glm::vec3(0.0f, 0.0f, 0.0f))
+    , m_scale(randomFloat(1.0f,5.0f))
+    , m_color(glm::vec4(randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), 1.0f))
+    , m_rotationSpeed1(0.0f)
+    , m_rotationSpeed2(0.0f)
+    , m_rotationVector1(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
+    , m_rotationVector2(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
+{}
+
+void Cube::_glInit(GLuint shader) {
+        m_shader = shader;
 
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao);
@@ -39,7 +53,6 @@ Cube::Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMa
                             0,          // Stride
                             0);         // Offset
         glEnableVertexAttribArray(posAttr);
-    }
 }
 
 Cube::~Cube()

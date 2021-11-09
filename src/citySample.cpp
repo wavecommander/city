@@ -60,7 +60,6 @@ void CitySample::init()
 
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
-        // m_pCityGrid = new Plane();
 
         glm::vec3 min = m_pCitadel->getAABBMin();
         glm::vec3 max = m_pCitadel->getAABBMax();
@@ -68,6 +67,7 @@ void CitySample::init()
 
         m_pOrbitCam = new OrbitCamera(m_pApp);
         m_pOrbitCam->focusOn(min,max);
+        // m_pOrbitCam->focusOn(glm::vec3(-1.0f,-1.0f,-1.0f),glm::vec3(1.0f,1.0f,1.0f));
 
         std::cout << "MIN:X" << min.x << ",Y" << min.y << ",Z" << min.z << 
                    ";MAX:X" << max.x << ",Y" << max.y << ",Z" << max.z <<  '\n';
@@ -75,6 +75,16 @@ void CitySample::init()
         float gridSize = 2.5f * wolf::max(max.x,max.z);
         m_pGrid = new Grid3D(10, gridSize / 10.0f);
         m_pGrid->hideAxes();
+
+        // m_pMat = wolf::MaterialManager::CreateMaterial("default");
+        // m_pMat->SetProgram("default.vsh", "default.fsh");
+        // m_pMat->SetDepthTest(true);
+
+        m_shader = wolf::LoadShaders("data/default.vsh", "data/default.fsh");
+
+        m_pPlane = new Plane(m_shader, 6);
+        m_pPlane->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+        m_pPlane->setColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
     }
 
     printf("Successfully initialized City Sample\n");
@@ -125,11 +135,13 @@ void CitySample::_renderImGui() {
     if (showDemoWindow)
         ImGui::ShowDemoWindow(&showDemoWindow);
     
-    ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Debug Menu");
 
-    ImGui::Checkbox("Demo Window", &showDemoWindow);      // Edit bools storing our window open/close state
+    ImGui::Checkbox("Demo Window", &showDemoWindow);
 
-    ImGui::ColorEdit3("glClearColor", (float*)&m_clearColor); // Edit 3 floats representing a color
+    ImGui::ColorEdit3("glClearColor", (float*)&m_clearColor);
+
+    ImGui::Text("m_time %f", m_time);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
@@ -140,10 +152,11 @@ void CitySample::_renderImGui() {
 
 void CitySample::update(float dt) 
 {
+    m_time += dt;
     m_pOrbitCam->update(dt);
     m_pGrid->update(dt);
     m_pCitadelPiece->Update(dt);
-    m_time += dt;
+    m_pPlane->update(dt);
 }
 
 void CitySample::render(int width, int height)
@@ -153,17 +166,20 @@ void CitySample::render(int width, int height)
 
 	glm::mat4 mProj = m_pOrbitCam->getProjMatrix(width, height);
 	glm::mat4 mView = m_pOrbitCam->getViewMatrix();
-  	glm::mat4 mWorld = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
-    mWorld = glm::translate(glm::mat4(1.0f), glm::vec3(50.0f, 100.0f, 5.0f)) * mWorld;
 
     m_pGrid->render(mView, mProj);
-    m_pCitadel->Render(mWorld, mView, mProj);
 
-	glm::mat4 mWorldPiece = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
-    mWorldPiece = glm::rotate(glm::mat4(1.0f), PI/2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldPiece;
-	mWorldPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, _calculateHammer(m_time), -1000.0f)) * mWorldPiece;
+  	glm::mat4 mWorldCitadel = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    mWorldCitadel = glm::translate(glm::mat4(1.0f), glm::vec3(50.0f, 100.0f, 5.0f)) * mWorldCitadel;
+    m_pCitadel->Render(mWorldCitadel, mView, mProj);
 
-    m_pCitadelPiece->Render(mWorldPiece, mView, mProj);
+	glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), PI/2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldCitadelPiece;
+	mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, _calculateHammer(m_time), -1000.0f)) * mWorldCitadelPiece;
+    m_pCitadelPiece->Render(mWorldCitadelPiece, mView, mProj);
+
+    glm::mat4 mWorldPlane = glm::mat4(1.0f);
+    m_pPlane->render(width, height, mProj, mView);
 
     if(m_renderDebugUI)
         _renderImGui();
