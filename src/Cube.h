@@ -2,7 +2,10 @@
 #define S_CUBE_H
 
 #include <string>
+
 #include "../wolf/wolf.h"
+
+#include "types.h"
 
 class Cube {
 public:

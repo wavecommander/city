@@ -6,6 +6,8 @@
 #include "../samplefw/Sample.h"
 #include "../samplefw/Grid3D.h"
 #include "../samplefw/OrbitCamera.h"
+
+#include "types.h"
 #include "Plane.h"
 
 class CitySample: public Sample

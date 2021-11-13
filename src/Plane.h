@@ -6,6 +6,8 @@
 
 #include "../wolf/wolf.h"
 
+#include "types.h"
+
 class Plane {
 public:
     Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);

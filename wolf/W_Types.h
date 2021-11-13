@@ -26,6 +26,10 @@ namespace wolf
 #define MATH_PI 3.141592654f
 #endif
 
+#if defined(_WIN64) || defined(_WIN32)
+typedef unsigned int uint;
+#endif
+
 inline float min(float a, float b)
 {
 	return a < b ? a : b;

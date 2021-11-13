@@ -104,12 +104,7 @@ add_executable(city
 # Linking dynamic/shared library for irrKlang 2D/3D Audio Engine
 if (WIN32)
     target_link_libraries(city
-        ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/winx64-visualStudio/irrKlang.dll
-    )
-endif ()
-if (APPLE)
-    target_link_libraries(city
-        ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/macosx-gcc/libirrklang.dylib
+        ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/lib/Winx64-visualStudio/irrKlang.lib
     )
 endif ()
 if (NOT WIN32 AND NOT APPLE)
