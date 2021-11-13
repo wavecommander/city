@@ -8,7 +8,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "../samplefw/SampleRunner.h"
-#include "citySample.h"
+#include "CitySample.h"
 
 class City: public wolf::App
 {

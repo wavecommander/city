@@ -6,7 +6,7 @@
 
 Build the project using Cmake and run the `city` executable.
 
-## Controls
+## Keyboard Controls
 
 | Key(s)        | Function      
 | ------------- |:-------------

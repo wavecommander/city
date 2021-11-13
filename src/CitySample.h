@@ -6,7 +6,7 @@
 #include "../samplefw/Sample.h"
 #include "../samplefw/Grid3D.h"
 #include "../samplefw/OrbitCamera.h"
-#include "plane.h"
+#include "Plane.h"
 
 class CitySample: public Sample
 {
@@ -32,19 +32,17 @@ private:
 
     float m_time = 0.0f;
 
-    wolf::Model* m_pCitadel = nullptr;
-    wolf::Model* m_pCitadelPiece = nullptr;
-
     wolf::Material* m_pMat = nullptr;
     wolf::Program* m_pProgram = nullptr;
-
     GLuint m_shader = 0;
+
+    wolf::Model* m_pCitadel = nullptr;
+    wolf::Model* m_pCitadelPiece = nullptr;
+    Plane *m_pPlane = nullptr;
 
     Grid3D* m_pGrid = nullptr;
     OrbitCamera* m_pOrbitCam = nullptr;
     irrklang::ISoundEngine* m_pAudioEngine = nullptr;
-
-    Plane *m_pPlane = nullptr;
 
     ImVec4 m_clearColor = ImVec4(0.0,0.0,0.0,0.0);
 };

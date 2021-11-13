@@ -2,7 +2,7 @@
 
 #include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
-#include "plane.h"
+#include "Plane.h"
 #include "utils.h"
 
 GLuint Plane::m_vao = 0, Plane::m_vbo = 0, Plane::m_shader = 0;

@@ -6,8 +6,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include "citySample.h"
-#include "plane.h"
+#include "CitySample.h"
+#include "Plane.h"
 
 bool showDemoWindow = false;
 
@@ -21,8 +21,7 @@ CitySample::~CitySample()
     delete m_pGrid;
     delete m_pOrbitCam;
 
-    if(m_pAudioEngine)
-        m_pAudioEngine->drop();
+    if(m_pAudioEngine) m_pAudioEngine->drop();
 }
 
 void CitySample::handleKeyPress(char key) {
@@ -50,9 +49,7 @@ void CitySample::handleKeyPress(char key) {
 
 void CitySample::init()
 {
-    if(!m_pAudioEngine) {
-        _initAudio();
-    }
+    if(!m_pAudioEngine) _initAudio();
 
     if(!m_pCitadel)
     {
@@ -115,7 +112,7 @@ constexpr float TOTAL_PERIOD = 6.494, // Citadel should hammer down every 6.494s
                 SLAM_FRACTION = 0.1f;
 
 float CitySample::_pulse(float t) {
-    if (t < SLAM_FRACTION * PULSE_WIDTH) 
+    if (t < SLAM_FRACTION * PULSE_WIDTH)
         return DEFAULT_VALUE + TRANSLATION * t / (SLAM_FRACTION * PULSE_WIDTH);
     return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
 }
@@ -134,7 +131,7 @@ void CitySample::_renderImGui() {
 
     if (showDemoWindow)
         ImGui::ShowDemoWindow(&showDemoWindow);
-    
+
     ImGui::Begin("Debug Menu");
 
     ImGui::Checkbox("Demo Window", &showDemoWindow);
@@ -181,6 +178,5 @@ void CitySample::render(int width, int height)
     glm::mat4 mWorldPlane = glm::mat4(1.0f);
     m_pPlane->render(width, height, mProj, mView);
 
-    if(m_renderDebugUI)
-        _renderImGui();
+    if(m_renderDebugUI) _renderImGui();
 }
