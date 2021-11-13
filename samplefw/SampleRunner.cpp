@@ -46,9 +46,9 @@ void SampleRunner::addSample(Sample* pSample)
 
 void SampleRunner::switchToSampleNumber(int num)
 {
-    m_pCurrSample->goToSleep();
     if(num < m_samples.size())
     {
+        m_pCurrSample->goToSleep();
         m_pCurrSample = m_samples[num];
         m_currSampleNumber = num;
         _sampleChanged();
