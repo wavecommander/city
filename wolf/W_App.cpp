@@ -105,6 +105,7 @@ void App::_init()
         _fatalError("Couldn't create window\n");
 
     glfwSetWindowUserPointer(m_pWindow, this);
+    glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetScrollCallback(m_pWindow, _mouseScrollCallback);
     glfwMakeContextCurrent(m_pWindow);
     glfwSwapInterval(1);
@@ -197,6 +198,12 @@ glm::vec2 App::getScreenSize() const
 void App::_setMouseScroll(const glm::vec2& scroll)
 {
     m_mouseScroll = scroll;
+}
+
+void App::setCaptureCursor(bool captureCursor)
+{
+    if(captureCursor) glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    else glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 }

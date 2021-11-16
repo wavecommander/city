@@ -82,8 +82,8 @@ void SampleRunner::switchToLastSample() {
     switchToSampleNumber(m_samples.size() -1);
 }
 
-void SampleRunner::handleKeyPress(char key) {
-    m_pCurrSample->handleKeyPress(key);
+void SampleRunner::setRenderDebugUI(bool renderDebugUI) {
+    m_pCurrSample->setRenderDebugUI(renderDebugUI);
 }
 
 void SampleRunner::_sampleChanged() 

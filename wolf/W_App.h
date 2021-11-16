@@ -26,6 +26,8 @@ namespace wolf
 
         GLFWwindow* getWindow() const { return m_pWindow; }
 
+        void setCaptureCursor(bool captureCursor);
+
         // Used internally but needs to be public
         void _setMouseScroll(const glm::vec2 &scroll);
 

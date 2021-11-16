@@ -9,6 +9,7 @@
 
 #include "types.h"
 #include "Plane.h"
+#include "FirstPersonCamera.h"
 
 class CitySample: public Sample
 {
@@ -20,33 +21,31 @@ public:
     void update(float dt) override;
     void render(int width, int height) override;
 
-    void handleKeyPress(char key) override;
     void goToSleep() override;
+    void setRenderDebugUI(bool renderDebugUI) override;
 
 private:
     void _initAudio();
     void _initImGui();
     void _renderImGui();
-    float _calculateHammer(float time);
-    float _pulse(float t);
-
-    bool m_renderDebugUI = false;
+    float _calculateCitadelPieceHammer(float time);
+    float _citadelPiecePulse(float t);
 
     float m_time = 0.0f;
+    ImVec4 m_clearColor = ImVec4(0.0,0.0,0.0,0.0);
 
+    GLuint m_shader = 0;
     wolf::Material* m_pMat = nullptr;
     wolf::Program* m_pProgram = nullptr;
-    GLuint m_shader = 0;
+    Grid3D* m_pGrid = nullptr;
+    OrbitCamera* m_pOrbitCam = nullptr;
+    FirstPersonCamera* m_pCamera = nullptr;
 
     wolf::Model* m_pCitadel = nullptr;
     wolf::Model* m_pCitadelPiece = nullptr;
     Plane *m_pPlane = nullptr;
 
-    Grid3D* m_pGrid = nullptr;
-    OrbitCamera* m_pOrbitCam = nullptr;
     irrklang::ISoundEngine* m_pAudioEngine = nullptr;
-
-    ImVec4 m_clearColor = ImVec4(0.0,0.0,0.0,0.0);
 };
 
 #endif // S_CITYSAMPLE_H

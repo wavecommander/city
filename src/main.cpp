@@ -49,6 +49,8 @@ private:
     bool m_pressedKeys[NUM_KEYS];
     bool m_aKeyIsPressed = false;
 
+    bool m_renderDebugUI = false;
+
     void _initImGui() {
         constexpr char const *GLSL_VER = "#version 150";
         IMGUI_CHECKVERSION();
@@ -60,10 +62,6 @@ private:
     }
 
     void _handleKeys() {
-        if(isKeyDown(' ')) {
-            m_pressedKeys[' '] = true;
-            m_aKeyIsPressed = true;
-        }
         if(isKeyDown('`')) {
             m_pressedKeys['`'] = true;
             m_aKeyIsPressed = true;
@@ -72,70 +70,41 @@ private:
             m_pressedKeys['r'] = true;
             m_aKeyIsPressed = true;
         }
-        if(isKeyDown('w')) {
-            m_pressedKeys['w'] = true;
+        if(isKeyDown(' ')) {
+            m_pressedKeys[' '] = true;
             m_aKeyIsPressed = true;
         }
-        if(isKeyDown('a')) {
-            m_pressedKeys['a'] = true;
-            m_aKeyIsPressed = true;
-        }
-        if(isKeyDown('s')) {
-            m_pressedKeys['s'] = true;
-            m_aKeyIsPressed = true;
-        }
-        if(isKeyDown('d')) {
-            m_pressedKeys['d'] = true;
-            m_aKeyIsPressed = true;
-        }
+
         if(m_aKeyIsPressed)
         {
             for(int i = 0; i < NUM_KEYS; ++i) {
                 if(!m_pressedKeys[i])
                     continue;
 
-                // R key to 'regenerate' new City
-                if (i == 'r' && !isKeyDown('r')) {
-                    m_sampleRunner.addSample(new CitySample(this));
-                    m_sampleRunner.switchToLastSample();
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
-                // SPACE to switch between Cities
-                if (i == ' ' && !isKeyDown(' ')) {
-                    m_sampleRunner.nextSample();
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
-                // W to move forward with FirstPersonCamera
-                if (i == 'w') {
-                    m_sampleRunner.handleKeyPress(i);
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
-                // A to move left with FirstPersonCamera
-                if (i == 'a') {
-                    m_sampleRunner.handleKeyPress(i);
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
-                // S to move backward with FirstPersonCamera
-                if (i == 's') {
-                    m_sampleRunner.handleKeyPress(i);
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
-                // D to move right with FirstPersonCamera
-                if (i == 'd') {
-                    m_sampleRunner.handleKeyPress(i);
-                    m_pressedKeys[i] = false;
-                    m_aKeyIsPressed = false;
-                }
                 // ` to toggle Debug UI
                 if (i == '`' && !isKeyDown(i)) {
-                    m_sampleRunner.handleKeyPress(i);
+                    printf("Toggling Debug Menus ... ");
+                    m_renderDebugUI = !m_renderDebugUI;
+                    m_sampleRunner.setRenderDebugUI(m_renderDebugUI);
+                    m_renderDebugUI ? printf("Enabled\n") : printf("Disabled\n");
                     m_pressedKeys[i] = false;
                     m_aKeyIsPressed = false;
+                }
+
+                if(!m_renderDebugUI) {
+                    // R key to 'regenerate' new City
+                    if (i == 'r' && !isKeyDown('r')) {
+                        m_sampleRunner.addSample(new CitySample(this));
+                        m_sampleRunner.switchToLastSample();
+                        m_pressedKeys[i] = false;
+                        m_aKeyIsPressed = false;
+                    }
+                    // SPACE to switch between Cities
+                    if (i == ' ' && !isKeyDown(' ')) {
+                        m_sampleRunner.nextSample();
+                        m_pressedKeys[i] = false;
+                        m_aKeyIsPressed = false;
+                    }
                 }
             }
         }

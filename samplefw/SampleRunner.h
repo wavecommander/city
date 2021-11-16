@@ -19,7 +19,7 @@ public:
     void nextSample();
     void switchToLastSample();
 
-    void handleKeyPress(char key);
+    void setRenderDebugUI(bool renderDebugUI);
 
 private:
     void _sampleChanged();

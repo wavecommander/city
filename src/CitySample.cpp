@@ -19,32 +19,9 @@ CitySample::~CitySample()
     wolf::MaterialManager::DestroyMaterial(m_pMat);
     delete m_pCitadel;
     delete m_pGrid;
-    delete m_pOrbitCam;
+    delete m_pCamera;
 
     if(m_pAudioEngine) m_pAudioEngine->drop();
-}
-
-void CitySample::handleKeyPress(char key) {
-    switch (key)
-    {
-        case '`':
-            printf("Toggling Debug Menus ... ");
-            m_renderDebugUI = !m_renderDebugUI;
-            m_renderDebugUI ? printf("Enabled\n") : printf("Disabled\n");
-            break;
-        case 'w':
-            printf("W is being pressed\n");
-            break;
-        case 'a':
-            printf("A is being pressed\n");
-            break;
-        case 's':
-            printf("S is being pressed\n");
-            break;
-        case 'd':
-            printf("D is being pressed\n");
-            break;
-    }
 }
 
 void CitySample::init()
@@ -62,9 +39,7 @@ void CitySample::init()
         glm::vec3 max = m_pCitadel->getAABBMax();
         glm::vec3 center = m_pCitadel->getAABBCenter();
 
-        m_pOrbitCam = new OrbitCamera(m_pApp);
-        m_pOrbitCam->focusOn(min,max);
-        // m_pOrbitCam->focusOn(glm::vec3(-1.0f,-1.0f,-1.0f),glm::vec3(1.0f,1.0f,1.0f));
+        m_pCamera = new FirstPersonCamera(m_pApp);
 
         std::cout << "MIN:X" << min.x << ",Y" << min.y << ",Z" << min.z << 
                    ";MAX:X" << max.x << ",Y" << max.y << ",Z" << max.z <<  '\n';
@@ -72,10 +47,6 @@ void CitySample::init()
         float gridSize = 2.5f * wolf::max(max.x,max.z);
         m_pGrid = new Grid3D(10, gridSize / 10.0f);
         m_pGrid->hideAxes();
-
-        // m_pMat = wolf::MaterialManager::CreateMaterial("default");
-        // m_pMat->SetProgram("default.vsh", "default.fsh");
-        // m_pMat->SetDepthTest(true);
 
         m_shader = wolf::LoadShaders("data/default.vsh", "data/default.fsh");
 
@@ -87,12 +58,23 @@ void CitySample::init()
     printf("Successfully initialized City Sample\n");
 }
 
-void CitySample::goToSleep() {
+void CitySample::goToSleep()
+{
     if(m_pAudioEngine) {
         m_pAudioEngine->drop();
         m_pAudioEngine = nullptr;
     }
     m_time = 0.0f;
+}
+
+void CitySample::setRenderDebugUI(bool renderDebugUI)
+{
+    m_renderDebugUI = renderDebugUI;
+    if(m_renderDebugUI) {
+        m_pApp->setCaptureCursor(false);
+    } else {
+        m_pApp->setCaptureCursor(true);
+    }
 }
 
 void CitySample::_initAudio() {
@@ -111,16 +93,16 @@ constexpr float TOTAL_PERIOD = 6.494, // Citadel should hammer down every 6.494s
                 PULSE_WIDTH = 6.0f,
                 SLAM_FRACTION = 0.1f;
 
-float CitySample::_pulse(float t) {
+float CitySample::_citadelPiecePulse(float t) {
     if (t < SLAM_FRACTION * PULSE_WIDTH)
         return DEFAULT_VALUE + TRANSLATION * t / (SLAM_FRACTION * PULSE_WIDTH);
     return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
 }
 
-float CitySample::_calculateHammer(float time) {
+float CitySample::_calculateCitadelPieceHammer(float time) {
     float t = fmod(time + PHASE_SHIFT, TOTAL_PERIOD);
     if (t > (TOTAL_PERIOD - PULSE_WIDTH))
-        return _pulse(t - TOTAL_PERIOD + PULSE_WIDTH);
+        return _citadelPiecePulse(t - TOTAL_PERIOD + PULSE_WIDTH);
     return DEFAULT_VALUE;
 }
 
@@ -150,7 +132,9 @@ void CitySample::_renderImGui() {
 void CitySample::update(float dt) 
 {
     m_time += dt;
-    m_pOrbitCam->update(dt);
+
+    if(!m_renderDebugUI) m_pCamera->update(dt);
+
     m_pGrid->update(dt);
     m_pCitadelPiece->Update(dt);
     m_pPlane->update(dt);
@@ -161,8 +145,8 @@ void CitySample::render(int width, int height)
 	glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 mProj = m_pOrbitCam->getProjMatrix(width, height);
-	glm::mat4 mView = m_pOrbitCam->getViewMatrix();
+	glm::mat4 mProj = m_pCamera->getProjMatrix(width, height);
+	glm::mat4 mView = m_pCamera->getViewMatrix();
 
     m_pGrid->render(mView, mProj);
 
@@ -172,7 +156,7 @@ void CitySample::render(int width, int height)
 
 	glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
     mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), PI/2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldCitadelPiece;
-	mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, _calculateHammer(m_time), -1000.0f)) * mWorldCitadelPiece;
+	mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, _calculateCitadelPieceHammer(m_time), -1000.0f)) * mWorldCitadelPiece;
     m_pCitadelPiece->Render(mWorldCitadelPiece, mView, mProj);
 
     glm::mat4 mWorldPlane = glm::mat4(1.0f);
