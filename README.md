@@ -14,3 +14,5 @@ Build the project using Cmake and run the `city` executable.
 | space         | cycle through generated cities
 | wasd          | first person camera controls
 | `             | toggle debug menus
+| mouse         | look around
+| scroll        | change FOV
