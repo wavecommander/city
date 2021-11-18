@@ -84,6 +84,14 @@ file(GLOB_RECURSE WOLF_HEADER_FILES
 	${CMAKE_SOURCE_DIR}/wolf/*.h
     ${CMAKE_SOURCE_DIR}/wolf/*.hpp)
 
+file(GLOB_RECURSE IMGUI_SOURCE_FILES 
+	${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.c
+    ${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.cpp)
+
+file(GLOB_RECURSE IMGUI_HEADER_FILES 
+	${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.h
+    ${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.hpp)
+
 file(GLOB_RECURSE SOURCE_FILES 
 	${CMAKE_SOURCE_DIR}/src/*.c
 	${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -97,6 +105,8 @@ add_executable(city
     ${SAMPLEFW_HEADER_FILES}
     ${WOLF_SOURCE_FILES}
     ${WOLF_HEADER_FILES}
+    ${IMGUI_SOURCE_FILES}
+    ${IMGUI_HEADER_FILES}
     ${SOURCE_FILES}
     ${HEADER_FILES}
     )

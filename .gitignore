@@ -1,4 +1,4 @@
 .*
 cmake-build-debug/
-city.code-workspace
+*.code-workspace
 /build

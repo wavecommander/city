@@ -23,5 +23,5 @@ protected:
     std::string m_name;
     wolf::App* m_pApp;
 
-    bool m_renderDebugUI;
+    bool m_renderDebugUI = false;
 };

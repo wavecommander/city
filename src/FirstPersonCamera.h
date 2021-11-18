@@ -2,13 +2,13 @@
 #define S_FPS_CAMERA_H
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "../wolf/wolf.h"
 
 static constexpr float
     ROT_Y = 0.0f,
     ROT_X = 0.0f,
-    SPEED = 200.0f,
+    SPEED = 50.0f,
+    SPRINT_FACTOR = 6.0f,
     MOUSE_SENS = 0.1f,
     FOV = 90.0f,
     FOV_STEP = 0.01f,

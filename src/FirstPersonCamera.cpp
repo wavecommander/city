@@ -43,7 +43,7 @@ void FirstPersonCamera::_processKeyboardMovement(float dt)
     
     if(m_pApp->isKeyDown(340) || m_pApp->isKeyDown(344)) // if right or left SHIFT, 'sprint'
     {
-        velocity *= 2;
+        velocity *= SPRINT_FACTOR;
     }
 
     if(m_pApp->isKeyDown('w'))

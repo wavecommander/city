@@ -8,9 +8,7 @@ out vec4 v_color;
 
 void main()
 {
-    vec4 pos = a_position;
-    pos.y += sin(u_time + pos.x);
-    gl_Position = u_world_view_proj * pos;
+    gl_Position = u_world_view_proj * a_position;
 
     v_color = u_color;
 }

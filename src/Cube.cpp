@@ -32,7 +32,10 @@ Cube::Cube(GLuint shader)
     , m_rotationSpeed2(0.0f)
     , m_rotationVector1(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
     , m_rotationVector2(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
-{}
+{
+    if(!m_vao)
+    _glInit(shader);
+}
 
 void Cube::_glInit(GLuint shader) {
         m_shader = shader;

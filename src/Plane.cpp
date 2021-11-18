@@ -42,7 +42,8 @@ Plane::Plane(GLuint shader, uint subdivisions)
     }
 }
 
-void Plane::_generateVertices() {
+void Plane::_generateVertices()
+{
     int numSquares = pow(4, (m_subdivisions - 1));
     int rowsCols = sqrt(numSquares);
     int half = rowsCols / 2;
@@ -64,7 +65,8 @@ void Plane::_generateVertices() {
     }
 }
 
-void Plane::_glInit(GLuint shader) {
+void Plane::_glInit(GLuint shader)
+{
     m_shader = shader;
 
     glGenVertexArrays(1, &m_vao);

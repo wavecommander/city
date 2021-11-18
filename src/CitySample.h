@@ -33,12 +33,12 @@ private:
 
     float m_time = 0.0f;
     ImVec4 m_clearColor = ImVec4(0.0,0.0,0.0,0.0);
+    ImVec4 m_planeColor = ImVec4(0.0,0.0,0.0,0.0);
+    bool m_showDemoWindow = false;
 
     GLuint m_shader = 0;
     wolf::Material* m_pMat = nullptr;
     wolf::Program* m_pProgram = nullptr;
-    Grid3D* m_pGrid = nullptr;
-    OrbitCamera* m_pOrbitCam = nullptr;
     FirstPersonCamera* m_pCamera = nullptr;
 
     wolf::Model* m_pCitadel = nullptr;

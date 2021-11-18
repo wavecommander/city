@@ -3,9 +3,9 @@
 
 #include <glm/glm.hpp>
 #include "../wolf/wolf.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+#include "../thirdparty/imgui/imgui.h"
+#include "../thirdparty/imgui/imgui_impl_glfw.h"
+#include "../thirdparty/imgui/imgui_impl_opengl3.h"
 
 #include "../samplefw/SampleRunner.h"
 #include "CitySample.h"
