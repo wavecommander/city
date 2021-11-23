@@ -8,15 +8,14 @@ set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "If the test suite for Assimp is built in 
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's export functionality." FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "If the supplementary tools for Assimp are built in addition to the library." FORCE)
 
-add_definitions(-DASSIMP_BUILD_NO_X_IMPORTER 
-                -DASSIMP_BUILD_NO_AMF_IMPORTER 
+add_definitions(-DASSIMP_BUILD_NO_X_IMPORTER
+                -DASSIMP_BUILD_NO_AMF_IMPORTER
                 -DASSIMP_BUILD_NO_3DS_IMPORTER
                 -DASSIMP_BUILD_NO_MD3_IMPORTER
                 -DASSIMP_BUILD_NO_MDL_IMPORTER
                 -DASSIMP_BUILD_NO_MD2_IMPORTER
                 -DASSIMP_BUILD_NO_PLY_IMPORTER
                 -DASSIMP_BUILD_NO_ASE_IMPORTER
-                -DASSIMP_BUILD_NO_OBJ_IMPORTER
                 -DASSIMP_BUILD_NO_HMP_IMPORTER
                 -DASSIMP_BUILD_NO_SMD_IMPORTER
                 -DASSIMP_BUILD_NO_MDC_IMPORTER
@@ -62,45 +61,45 @@ add_subdirectory(thirdparty/assimp)
 add_subdirectory(thirdparty/glew/build/cmake)
 
 include_directories(
-    thirdparty/glfw/include 
-    thirdparty/glm 
-    thirdparty/glew/include 
+    thirdparty/glfw/include
+    thirdparty/glm
+    thirdparty/glew/include
     thirdparty/assimp/include
     ${OPENGL_INCLUDE_DIRS})
 
-file(GLOB_RECURSE SAMPLEFW_SOURCE_FILES 
+file(GLOB_RECURSE SAMPLEFW_SOURCE_FILES
 	${CMAKE_SOURCE_DIR}/samplefw/*.c
     ${CMAKE_SOURCE_DIR}/samplefw/*.cpp)
 
-file(GLOB_RECURSE SAMPLEFW_HEADER_FILES 
+file(GLOB_RECURSE SAMPLEFW_HEADER_FILES
 	${CMAKE_SOURCE_DIR}/samplefw/*.h
     ${CMAKE_SOURCE_DIR}/samplefw/*.hpp)
 
-file(GLOB_RECURSE WOLF_SOURCE_FILES 
+file(GLOB_RECURSE WOLF_SOURCE_FILES
 	${CMAKE_SOURCE_DIR}/wolf/*.c
     ${CMAKE_SOURCE_DIR}/wolf/*.cpp)
 
-file(GLOB_RECURSE WOLF_HEADER_FILES 
+file(GLOB_RECURSE WOLF_HEADER_FILES
 	${CMAKE_SOURCE_DIR}/wolf/*.h
     ${CMAKE_SOURCE_DIR}/wolf/*.hpp)
 
-file(GLOB_RECURSE IMGUI_SOURCE_FILES 
+file(GLOB_RECURSE IMGUI_SOURCE_FILES
 	${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.c
     ${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.cpp)
 
-file(GLOB_RECURSE IMGUI_HEADER_FILES 
+file(GLOB_RECURSE IMGUI_HEADER_FILES
 	${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.h
     ${CMAKE_SOURCE_DIR}/thirdparty/imgui/*.hpp)
 
-file(GLOB_RECURSE SOURCE_FILES 
+file(GLOB_RECURSE SOURCE_FILES
 	${CMAKE_SOURCE_DIR}/src/*.c
 	${CMAKE_SOURCE_DIR}/src/*.cpp)
-	
-file(GLOB_RECURSE HEADER_FILES 
+
+file(GLOB_RECURSE HEADER_FILES
 	${CMAKE_SOURCE_DIR}/src/*.h
     ${CMAKE_SOURCE_DIR}/src/*.hpp)
 
-add_executable(city 
+add_executable(city
     ${SAMPLEFW_SOURCE_FILES}
     ${SAMPLEFW_HEADER_FILES}
     ${WOLF_SOURCE_FILES}
@@ -115,6 +114,11 @@ add_executable(city
 if (WIN32)
     target_link_libraries(city
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/lib/Winx64-visualStudio/irrKlang.lib
+    )
+endif ()
+if (APPLE)
+    target_link_libraries(city
+        ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/macosx-gcc/libirrklang.dylib
     )
 endif ()
 if (NOT WIN32 AND NOT APPLE)
