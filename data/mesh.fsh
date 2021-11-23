@@ -9,5 +9,3 @@ void main()
 {
     PixelColor = vec4(1.0,1.0,0.0,1.0) * max(0, dot(v_normal.xyz, LIGHT_DIR));
 }
-
-
