@@ -8,7 +8,7 @@
 namespace wolf
 {
 
-void _fatalError(const char* msg) 
+void _fatalError(const char* msg)
 {
     fprintf(stderr, "Error: %s\n", msg);
     exit(1);
@@ -113,7 +113,7 @@ void App::_init()
     GLenum err = glewInit();
     if (GLEW_OK != err)
         _fatalError((const char*)glewGetErrorString(err));
-    else   
+    else
         printf("Successfully initialized GLEW\n");
 }
 
@@ -202,8 +202,12 @@ void App::_setMouseScroll(const glm::vec2& scroll)
 
 void App::setCaptureCursor(bool captureCursor)
 {
-    if(captureCursor) glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    else glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    if(captureCursor != m_captureCursor) {
+        if(captureCursor) glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+        m_captureCursor = captureCursor;
+    }
 }
 
 }

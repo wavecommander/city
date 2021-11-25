@@ -15,4 +15,6 @@ Build the project using CMake and run the `city` executable.
 | wasd          | first person camera controls
 | mouse         | look around with first person camera
 | scroll        | change camera FOV
-| `             | toggle debug menus (disables camera controls)
+| shift         | 'sprint' (temporarily increase camera movement speed and FOV)
+| `             | toggle debug menus
+| ctrl          | use camera while debug menus are open

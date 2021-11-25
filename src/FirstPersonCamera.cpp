@@ -111,8 +111,7 @@ std::string FirstPersonCamera::toString() const
     std::ostringstream out;
     out.precision(4);
 
-    out << "FPS Camera: "
-        << "Pos:X" << m_position.x << ";Y" << m_position.y << ";Z" << m_position.z
+    out << "Pos:X" << m_position.x << ";Y" << m_position.y << ";Z" << m_position.z
         << "\nROTX:" << m_rotX << "; ROTY:" << m_rotY << "; FOV:" << m_fov
         << "\nLast Mouse Pos: X" << m_lastMousePos.x << ";Y" << m_lastMousePos.y
         << "\n";
@@ -136,5 +135,10 @@ void FirstPersonCamera::updateMousePosition()
 
 void FirstPersonCamera::renderImGui()
 {
+    if (!ImGui::CollapsingHeader("Camera"))
+        return;
+
     ImGui::Text("%s", this->toString().c_str());
+
+    ImGui::InputFloat3("Position", &(m_position[0]));
 }

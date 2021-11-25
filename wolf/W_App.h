@@ -42,6 +42,7 @@ namespace wolf
         GLFWwindow *m_pWindow = nullptr;
         std::string m_name;
         glm::vec2 m_mouseScroll;
+        bool m_captureCursor = true;
 
         static const int NUM_KEYS = GLFW_KEY_LAST - GLFW_KEY_SPACE;
         bool m_lastKeysDown[NUM_KEYS];

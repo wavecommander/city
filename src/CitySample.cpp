@@ -97,23 +97,23 @@ void CitySample::_renderImGui()
 
     ImGui::Begin("City Sample Debug Menu");
 
-    ImGui::Text("m_time %f", m_time);
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
     ImGui::Checkbox("Demo Window", &m_showDemoWindow);
     if (m_showDemoWindow)
         ImGui::ShowDemoWindow(&m_showDemoWindow);
 
+    ImGui::Separator();
+
+    ImGui::Text("m_time %f", m_time);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
     ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
     ImGui::ColorEdit3("Plane Color", (float *)&m_planeColor);
 
-    // ImGui::DragFloat("FOV", &(m_pCamera->m_fov), 0.1f, -2.0f, 2.0f);
+    ImGui::Separator();
 
     m_pCamera->renderImGui();
 
     ImGui::End();
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -135,9 +135,6 @@ void CitySample::_handle_keys()
                 printf("Toggling Debug Menus ... ");
                 m_renderDebugUI = !m_renderDebugUI;
                 m_renderDebugUI ? printf("Enabled\n") : printf("Disabled\n");
-
-                m_pApp->setCaptureCursor(!m_renderDebugUI);
-
                 m_pressedKeys[i] = false;
                 m_aKeyIsPressed = false;
             }
@@ -154,10 +151,15 @@ void CitySample::update(float dt)
 
     m_time += dt;
 
-    if (!m_renderDebugUI)
+    if (!m_renderDebugUI || (m_pApp->isKeyDown(341) || m_pApp->isKeyDown(345))) { // also probably not the best, but it works!
         m_pCamera->update(dt);
-    else
+        m_pApp->setCaptureCursor(true);
+    } else {
         m_pCamera->updateMousePosition(); // this fixes the camera angle changing wildly with the mouse pos upon toggling debug UI
+        m_pApp->setCaptureCursor(false);
+    }
+
+    m_pPlane->setColor(glm::vec4(m_planeColor.x, m_planeColor.y, m_planeColor.z, m_planeColor.w));
 }
 
 void CitySample::render(int width, int height)
@@ -181,9 +183,7 @@ void CitySample::render(int width, int height)
     m_pCitadelPiece->Render(mWorldCitadelPiece, mView, mProj);
 
     // Plane for testing/basis for Grid
-    m_pPlane->setColor(glm::vec4(m_planeColor.x, m_planeColor.y, m_planeColor.z, m_planeColor.w));
-    glm::mat4 mWorldPlane = glm::mat4(1.0f);
-    m_pPlane->render(width, height, mProj, mView);
+    // m_pPlane->render(width, height, mProj, mView);
 
     if (m_renderDebugUI)
         _renderImGui();
