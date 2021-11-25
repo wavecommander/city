@@ -8,7 +8,8 @@
 
 #include "types.h"
 
-class Plane {
+class Plane
+{
 public:
     Plane(GLuint shader, uint subdivisions, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     Plane(GLuint shader, uint subdivisions);
@@ -38,7 +39,6 @@ public:
     glm::vec3 getRotationVector1() const;
     glm::vec3 getRotationVector2() const;
 
-
 private:
     uint m_subdivisions = 1;
 
@@ -48,7 +48,7 @@ private:
     static GLuint m_vao, m_vbo, m_shader;
     void _glInit(GLuint shader);
 
-    glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
     float m_scale = 1.0f;
     glm::mat4 m_transformMatrix = glm::mat4(1.0f);
 
@@ -57,10 +57,10 @@ private:
     float m_currentRotation = 0.0f;
     float m_rotationSpeed1 = 1.0f;
     float m_rotationSpeed2 = 1.0f;
-    glm::vec3 m_rotationVector1 = glm::vec3(1.0f,0.0f,0.0f);
-    glm::vec3 m_rotationVector2 = glm::vec3(0.0f,1.0f,0.0f);
+    glm::vec3 m_rotationVector1 = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 m_rotationVector2 = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::vec4 m_color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+    glm::vec4 m_color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 };
 
 #endif // S_PLANE_H

@@ -2,14 +2,14 @@
 #include "Sample.h"
 
 SampleRunner::SampleRunner()
-    : m_currSampleNumber(-1), m_pCurrSample(nullptr)
+    : m_currSampleNumber(-1)
+    , m_pCurrSample(nullptr)
 {
 }
 
 SampleRunner::~SampleRunner()
 {
-    for(auto it = m_samples.begin(); it != m_samples.end(); ++it) 
-    {
+    for (auto it = m_samples.begin(); it != m_samples.end(); ++it) {
         auto sample = *it;
         delete sample;
     }
@@ -25,19 +25,17 @@ void SampleRunner::render(int width, int height)
     m_pCurrSample->render(width, height);
 }
 
-void SampleRunner::addSample(Sample* pSample)
+void SampleRunner::addSample(Sample *pSample)
 {
-    for(auto it = m_samples.begin(); it != m_samples.end(); ++it) 
-    {
+    for (auto it = m_samples.begin(); it != m_samples.end(); ++it) {
         auto sample = *it;
-        if(sample == pSample)
+        if (sample == pSample)
             return; // already got it
     }
 
     m_samples.push_back(pSample);
 
-    if(!m_pCurrSample)
-    {
+    if (!m_pCurrSample) {
         m_pCurrSample = pSample;
         m_currSampleNumber = 0;
         _sampleChanged();
@@ -46,8 +44,7 @@ void SampleRunner::addSample(Sample* pSample)
 
 void SampleRunner::switchToSampleNumber(int num)
 {
-    if(num < m_samples.size())
-    {
+    if (num < m_samples.size()) {
         m_pCurrSample->goToSleep();
         m_pCurrSample = m_samples[num];
         m_currSampleNumber = num;
@@ -55,12 +52,10 @@ void SampleRunner::switchToSampleNumber(int num)
     }
 }
 
-void SampleRunner::switchToSampleWithName(const std::string& name)
+void SampleRunner::switchToSampleWithName(const std::string &name)
 {
-    for(int i = 0; i < m_samples.size(); ++i)
-    {
-        if(m_samples[i]->getName() == name)
-        {
+    for (int i = 0; i < m_samples.size(); ++i) {
+        if (m_samples[i]->getName() == name) {
             m_pCurrSample->goToSleep();
             m_pCurrSample = m_samples[i];
             m_currSampleNumber = i;
@@ -78,15 +73,12 @@ void SampleRunner::nextSample()
     _sampleChanged();
 }
 
-void SampleRunner::switchToLastSample() {
-    switchToSampleNumber(m_samples.size() -1);
+void SampleRunner::switchToLastSample()
+{
+    switchToSampleNumber(m_samples.size() - 1);
 }
 
-void SampleRunner::setRenderDebugUI(bool renderDebugUI) {
-    m_pCurrSample->setRenderDebugUI(renderDebugUI);
-}
-
-void SampleRunner::_sampleChanged() 
+void SampleRunner::_sampleChanged()
 {
     printf("Switched to sample %s\n", m_pCurrSample->getName().c_str());
     m_pCurrSample->init();

@@ -19,8 +19,6 @@ public:
     void nextSample();
     void switchToLastSample();
 
-    void setRenderDebugUI(bool renderDebugUI);
-
 private:
     void _sampleChanged();
 

@@ -7,7 +7,8 @@
 
 #include "types.h"
 
-class Cube {
+class Cube
+{
 public:
     Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMatrix, glm::vec4 color, float rotationSpeed1, float rotationSpeed2, glm::vec3 rotationVector1, glm::vec3 rotationVector2);
     Cube(GLuint shader);
@@ -36,7 +37,6 @@ public:
     float getRotationSpeed2() const;
     glm::vec3 getRotationVector1() const;
     glm::vec3 getRotationVector2() const;
-
 
 private:
     static GLuint m_vao, m_vbo, m_shader;

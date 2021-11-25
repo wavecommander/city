@@ -4,15 +4,15 @@
 
 ## Building and Running
 
-Build the project using Cmake and run the `city` executable.
+Build the project using CMake and run the `city` executable.
 
 ## Keyboard Controls
 
-| Key(s)        | Function      
+| Key(s)        | Function
 | ------------- |:-------------
 | r             | generate new city and switch to it
 | space         | cycle through generated cities
 | wasd          | first person camera controls
-| `             | toggle debug menus
-| mouse         | look around
-| scroll        | change FOV
+| mouse         | look around with first person camera
+| scroll        | change camera FOV
+| `             | toggle debug menus (disables camera controls)

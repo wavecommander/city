@@ -1,6 +1,3 @@
-#include <math.h>
-#include <stdlib.h>
+#include "utils.h"
 
-float randomFloat(float lower, float upper) {
-	return lower + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(upper-lower)));
-}
+// Stub for misc utilities

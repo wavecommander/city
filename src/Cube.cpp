@@ -1,7 +1,7 @@
 #include <sstream>
 
-#include "../wolf/wolf.h"
 #include "../samplefw/Sample.h"
+#include "../wolf/wolf.h"
 
 #include "Cube.h"
 #include "utils.h"
@@ -20,48 +20,49 @@ Cube::Cube(GLuint shader, glm::vec3 position, float scale, glm::mat4 transformMa
     , m_rotationVector1(rotationVector1)
     , m_rotationVector2(rotationVector2)
 {
-    if(!m_vao)
+    if (!m_vao)
         _glInit(shader);
 }
 
 Cube::Cube(GLuint shader)
     : m_position(glm::vec3(0.0f, 0.0f, 0.0f))
-    , m_scale(randomFloat(1.0f,5.0f))
-    , m_color(glm::vec4(randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), randomFloat(0.0f,1.0f), 1.0f))
+    , m_scale(wolf::randFloat(1.0f, 5.0f))
+    , m_color(glm::vec4(wolf::randFloat(0.0f, 1.0f), wolf::randFloat(0.0f, 1.0f), wolf::randFloat(0.0f, 1.0f), 1.0f))
     , m_rotationSpeed1(0.0f)
     , m_rotationSpeed2(0.0f)
-    , m_rotationVector1(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
-    , m_rotationVector2(glm::vec3(randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f), randomFloat(-1.0f,1.0f)))
+    , m_rotationVector1(glm::vec3(wolf::randFloat(-1.0f, 1.0f), wolf::randFloat(-1.0f, 1.0f), wolf::randFloat(-1.0f, 1.0f)))
+    , m_rotationVector2(glm::vec3(wolf::randFloat(-1.0f, 1.0f), wolf::randFloat(-1.0f, 1.0f), wolf::randFloat(-1.0f, 1.0f)))
 {
-    if(!m_vao)
-    _glInit(shader);
+    if (!m_vao)
+        _glInit(shader);
 }
 
-void Cube::_glInit(GLuint shader) {
-        m_shader = shader;
+void Cube::_glInit(GLuint shader)
+{
+    m_shader = shader;
 
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
 
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * NUM_VERTS * 3, VERTICES, GL_STATIC_DRAW);
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * NUM_VERTS * 3, VERTICES, GL_STATIC_DRAW);
 
-        int posAttr = glGetAttribLocation(m_shader, "a_position");
+    int posAttr = glGetAttribLocation(m_shader, "a_position");
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glVertexAttribPointer(posAttr,  // Attribute location
-                            3,          // Number of components
-                            GL_FLOAT,   // Type of each component
-                            GL_FALSE,   // Normalize?
-                            0,          // Stride
-                            0);         // Offset
-        glEnableVertexAttribArray(posAttr);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glVertexAttribPointer(posAttr, // Attribute location
+        3, // Number of components
+        GL_FLOAT, // Type of each component
+        GL_FALSE, // Normalize?
+        0, // Stride
+        0); // Offset
+    glEnableVertexAttribArray(posAttr);
 }
 
 Cube::~Cube()
 {
-    if(m_vao) {
+    if (m_vao) {
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
         m_vao = 0;
@@ -77,18 +78,18 @@ void Cube::update(float dt)
 void Cube::render(int width, int height, const glm::mat4 &mProj, const glm::mat4 &mView) const
 {
     glm::mat4 mWorld = glm::translate(glm::mat4(1.0f), m_position);
-	glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed1, m_rotationVector1);
-	mRotate = mRotate * glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed2, m_rotationVector2);
+    glm::mat4 mRotate = glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed1, m_rotationVector1);
+    mRotate = mRotate * glm::rotate(glm::mat4(1.0f), m_currentRotation * m_rotationSpeed2, m_rotationVector2);
     glm::mat4 mScale = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale, m_scale, m_scale));
-	glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * m_transformMatrix;
-	
+    glm::mat4 mWorldViewProj = mProj * mView * mWorld * mRotate * mScale * m_transformMatrix;
+
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_world_view_proj"), 1, GL_FALSE, glm::value_ptr(mWorldViewProj));
 
     glUniform4f(glGetUniformLocation(m_shader, "u_color"), m_color.x, m_color.y, m_color.z, m_color.w);
 
     glBindVertexArray(m_vao);
 
-	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
 }
 
 std::string Cube::toString(uint id) const
@@ -102,7 +103,7 @@ std::string Cube::toString(uint id) const
         << "; Rotation Vector 1:X" << m_rotationVector1.x << ",Y" << m_rotationVector1.y << ",Z" << m_rotationVector1.z
         << "; Rotation Vector 2:X" << m_rotationVector2.x << ",Y" << m_rotationVector2.y << ",Z" << m_rotationVector2.z
         << "; Color:R" << m_color.r << ",G" << m_color.g << ",B" << m_color.b
-    << "\n";
+        << "\n";
 
     return out.str();
 }

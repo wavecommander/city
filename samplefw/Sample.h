@@ -4,7 +4,7 @@
 
 namespace wolf { class App; }
 
-class Sample 
+class Sample
 {
 public:
     Sample(wolf::App* pApp, const std::string& name) : m_name(name), m_pApp(pApp) {}
@@ -17,11 +17,8 @@ public:
     virtual void render(int width, int height) = 0;
 
     virtual void goToSleep() = 0;
-    virtual void setRenderDebugUI(bool renderDebugUI) = 0;
 
 protected:
     std::string m_name;
     wolf::App* m_pApp;
-
-    bool m_renderDebugUI = false;
 };
