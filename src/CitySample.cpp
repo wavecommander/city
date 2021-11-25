@@ -10,7 +10,6 @@
 
 #include "CitySample.h"
 #include "Grid.h"
-#include "Plane.h"
 #include "utils.h"
 
 CitySample::CitySample(wolf::App *pApp)
@@ -27,8 +26,6 @@ CitySample::~CitySample()
 
     delete m_pCamera;
 
-    delete m_pPlane;
-
     if (m_pAudioEngine)
         m_pAudioEngine->drop();
 }
@@ -39,7 +36,6 @@ void CitySample::init()
         m_renderDebugUI = false;
 
         m_clearColor = ImVec4(0.45f, 0.55f, 0.6f, 1.0f);
-        m_planeColor = ImVec4(wolf::randFloat(0.0f, 1.0f), wolf::randFloat(0.0f, 1.0f), wolf::randFloat(0.0f, 1.0f), 1.0f);
 
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
@@ -47,9 +43,6 @@ void CitySample::init()
         m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f);
 
         m_shader = wolf::LoadShaders("data/default.vsh", "data/default.fsh");
-        m_pPlane = new Plane(m_shader, 8);
-        m_pPlane->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-        m_pPlane->setScale(64.0f);
     }
 
     printf("Successfully initialized City Sample\n");
@@ -74,6 +67,15 @@ void CitySample::goToSleep()
     m_time = 0.0f;
 }
 
+static constexpr float
+    TOTAL_PERIOD = 6.494, // Citadel should hammer down every 6.494s
+    PHASE_SHIFT = 1.0f, // Need offset to sync up with sound
+    DEFAULT_VALUE = 235.0f, // Start Y = 235.0f
+    TRANSLATION = -75.0f, // End Y = 160.0f
+    PULSE_WIDTH = 6.0f,
+    SLAM_FRACTION = 0.1f,
+    CITADEL_SCALE = 0.01f;
+
 float CitySample::_citadelPiecePulse(float t)
 {
     if (t < SLAM_FRACTION * PULSE_WIDTH)
@@ -81,9 +83,9 @@ float CitySample::_citadelPiecePulse(float t)
     return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
 }
 
-float CitySample::_calculateCitadelPieceHammer(float time)
+float CitySample::_calculateCitadelPieceHammer()
 {
-    float t = fmod(time + PHASE_SHIFT, TOTAL_PERIOD);
+    float t = fmod(m_time + PHASE_SHIFT, TOTAL_PERIOD);
     if (t > (TOTAL_PERIOD - PULSE_WIDTH))
         return _citadelPiecePulse(t - TOTAL_PERIOD + PULSE_WIDTH);
     return DEFAULT_VALUE;
@@ -107,7 +109,6 @@ void CitySample::_renderImGui()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
     ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
-    ImGui::ColorEdit3("Plane Color", (float *)&m_planeColor);
 
     ImGui::Separator();
 
@@ -158,8 +159,6 @@ void CitySample::update(float dt)
         m_pCamera->updateMousePosition(); // this fixes the camera angle changing wildly with the mouse pos upon toggling debug UI
         m_pApp->setCaptureCursor(false);
     }
-
-    m_pPlane->setColor(glm::vec4(m_planeColor.x, m_planeColor.y, m_planeColor.z, m_planeColor.w));
 }
 
 void CitySample::render(int width, int height)
@@ -179,11 +178,8 @@ void CitySample::render(int width, int height)
     glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
     mWorldCitadelPiece = glm::scale(mWorldCitadelPiece, glm::vec3(CITADEL_SCALE, CITADEL_SCALE, CITADEL_SCALE));
     mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), PI / 2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldCitadelPiece;
-    mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(2.50f, _calculateCitadelPieceHammer(m_time), -10.0f)) * mWorldCitadelPiece;
+    mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(2.50f, _calculateCitadelPieceHammer(), -10.0f)) * mWorldCitadelPiece;
     m_pCitadelPiece->Render(mWorldCitadelPiece, mView, mProj);
-
-    // Plane for testing/basis for Grid
-    // m_pPlane->render(width, height, mProj, mView);
 
     if (m_renderDebugUI)
         _renderImGui();

@@ -7,7 +7,7 @@
 class FirstPersonCamera
 {
 public:
-    FirstPersonCamera(wolf::App *pApp, glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float rotX = DEF_ROT_X, float rotY = DEF_ROT_Y);
+    FirstPersonCamera(wolf::App *pApp, const glm::vec3 &position, const glm::vec3 &up, float rotX = DEF_ROT_X, float rotY = DEF_ROT_Y);
     ~FirstPersonCamera() { }
 
     void focusOn(const glm::vec3 &min, const glm::vec3 &max);

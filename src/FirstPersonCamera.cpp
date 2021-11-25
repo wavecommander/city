@@ -7,7 +7,7 @@
 
 #include "FirstPersonCamera.h"
 
-FirstPersonCamera::FirstPersonCamera(wolf::App *pApp, glm::vec3 position, glm::vec3 up, float rotX, float rotY)
+FirstPersonCamera::FirstPersonCamera(wolf::App *pApp, const glm::vec3 &position, const glm::vec3 &up, float rotX, float rotY)
     : m_pApp(pApp)
     , m_position(position)
     , m_up(up)
