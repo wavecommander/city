@@ -1,8 +1,8 @@
 #ifndef S_CITYSAMPLE_H
 #define S_CITYSAMPLE_H
 
-#include "../thirdparty/irrKlang/include/irrKlang.h"
-#include "../thirdparty/imgui/imgui.h"
+#include <irrKlang.h>
+#include <imgui.h>
 #include "../samplefw/Sample.h"
 #include "../wolf/wolf.h"
 

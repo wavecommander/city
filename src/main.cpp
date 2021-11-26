@@ -2,9 +2,9 @@
 #include <stdio.h>
 
 #include <glm/glm.hpp>
-#include "../thirdparty/imgui/imgui.h"
-#include "../thirdparty/imgui/imgui_impl_glfw.h"
-#include "../thirdparty/imgui/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include "../wolf/wolf.h"
 #include "../samplefw/SampleRunner.h"
 

@@ -65,6 +65,8 @@ include_directories(
     thirdparty/glm
     thirdparty/glew/include
     thirdparty/assimp/include
+    thirdparty/imgui
+    thirdparty/irrKlang/include
     ${OPENGL_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SAMPLEFW_SOURCE_FILES

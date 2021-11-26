@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "../thirdparty/imgui/imgui.h"
+#include <imgui.h>
 #include "../wolf/wolf.h"
 
 #include "FirstPersonCamera.h"

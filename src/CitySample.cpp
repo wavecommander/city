@@ -2,11 +2,11 @@
 #include <math.h>
 #include <vector>
 
-#include "glm/fwd.hpp"
-#include "../thirdparty/imgui/imgui.h"
-#include "../thirdparty/imgui/imgui_impl_glfw.h"
-#include "../thirdparty/imgui/imgui_impl_opengl3.h"
-#include "../thirdparty/irrKlang/include/irrKlang.h"
+#include <glm/fwd.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <irrKlang.h>
 
 #include "CitySample.h"
 #include "Grid.h"

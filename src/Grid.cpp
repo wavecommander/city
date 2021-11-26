@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include <glm/glm.hpp>
-#include "glm/fwd.hpp"
-#include "../thirdparty/imgui/imgui.h"
+#include <glm/fwd.hpp>
+#include <imgui.h>
 
 #include "Grid.h"
 

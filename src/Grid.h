@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <glm/glm.hpp>
-#include "glm/fwd.hpp"
+#include <glm/fwd.hpp>
 #include "../wolf/wolf.h"
 
 class Grid
