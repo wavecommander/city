@@ -1,7 +1,6 @@
 #ifndef S_CITYSAMPLE_H
 #define S_CITYSAMPLE_H
 
-#include <irrKlang.h>
 #include <imgui.h>
 #include "../samplefw/Sample.h"
 #include "../wolf/wolf.h"
@@ -41,13 +40,10 @@ private:
     wolf::Model *m_pCitadel = nullptr;
     wolf::Model *m_pCitadelPiece = nullptr;
 
-    irrklang::ISoundEngine *m_pAudioEngine = nullptr;
-
     static constexpr size_t NUM_KEYS = 256;
     bool m_pressedKeys[NUM_KEYS];
     bool m_aKeyIsPressed = false;
     bool m_renderDebugUI = false;
-
 };
 
 #endif // S_CITYSAMPLE_H

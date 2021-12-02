@@ -118,16 +118,13 @@ if (WIN32)
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/lib/Winx64-visualStudio/irrKlang.lib
     )
 endif ()
-if (APPLE)
-    target_link_libraries(city
-        ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/macosx-gcc/libirrklang.dylib
-    )
-endif ()
 if (NOT WIN32 AND NOT APPLE)
     target_link_libraries(city
         ${CMAKE_SOURCE_DIR}/thirdparty/irrKlang/bin/linux-gcc-64/libIrrKlang.so
     )
 endif ()
+
+target_compile_features(city PRIVATE cxx_std_17)
 
 target_link_libraries(city assimp glfw glew ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
 

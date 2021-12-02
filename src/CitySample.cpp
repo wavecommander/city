@@ -6,7 +6,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <irrKlang.h>
 
 #include "CitySample.h"
 #include "Grid.h"
@@ -25,9 +24,6 @@ CitySample::~CitySample()
     delete m_pCitadelPiece;
 
     delete m_pCamera;
-
-    if (m_pAudioEngine)
-        m_pAudioEngine->drop();
 }
 
 void CitySample::init()
@@ -50,20 +46,10 @@ void CitySample::init()
 
 void CitySample::_initAudio()
 {
-    m_pAudioEngine = irrklang::createIrrKlangDevice();
-    if (!m_pAudioEngine) {
-        printf("Could not startup Audio Engine\n");
-        return;
-    }
-    m_pAudioEngine->play2D("data/citadel_alert_cut.ogg", true);
 }
 
 void CitySample::goToSleep()
 {
-    if (m_pAudioEngine) {
-        m_pAudioEngine->drop();
-        m_pAudioEngine = nullptr;
-    }
     m_time = 0.0f;
 }
 
@@ -146,9 +132,6 @@ void CitySample::_handle_keys()
 void CitySample::update(float dt)
 {
     _handle_keys();
-
-    if (!m_pAudioEngine)
-        _initAudio(); // moved init here to deal with audio syncing problem; shouldn't be too bad with branch prediction
 
     m_time += dt;
 
