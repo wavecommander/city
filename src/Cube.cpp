@@ -4,7 +4,6 @@
 #include "../wolf/wolf.h"
 
 #include "Cube.h"
-#include "utils.h"
 
 constexpr GLfloat Cube::VERTICES[];
 

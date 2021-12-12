@@ -5,7 +5,7 @@
 
 #include "../wolf/wolf.h"
 
-#include "types.h"
+#include "utils.h"
 
 class Cube
 {
