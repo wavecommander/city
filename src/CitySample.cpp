@@ -1,14 +1,17 @@
-#include <iostream>
-#include <math.h>
-#include <vector>
-
 #include <glm/fwd.hpp>
+#include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
 #include "Grid.h"
+#include "Plane.h"
+#include "Skybox.h"
+#include "types.h"
 #include "utils.h"
 #include "CitySample.h"
+
+int CitySample::gridLength = 15;
+int CitySample::gridWidth = 15;
 
 CitySample::CitySample(wolf::App *pApp)
     : Sample(pApp, "Cityscape")
@@ -18,8 +21,9 @@ CitySample::CitySample(wolf::App *pApp)
 CitySample::~CitySample()
 {
     printf("Destroying City Sample\n");
-    delete m_pGrid;
     delete m_pCamera;
+
+    delete m_pGrid;
 
     delete m_pCitadel;
     delete m_pCitadelPiece;
@@ -33,7 +37,8 @@ void CitySample::init()
     if (!m_pCitadel) {
         m_renderDebugUI = false;
 
-        m_clearColor = ImVec4(0.45f, 0.55f, 0.6f, 1.0f);
+        //TODO: remove line; just for debugging
+        m_pApp->setCaptureCursor(false);
 
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
@@ -45,9 +50,14 @@ void CitySample::init()
         // m_pFactory = new wolf::Model("data/factor.fbx");
         // m_pSkyscraper = new wolf::Model("data/skyscraper.fbx");
 
-        m_pGrid = new Grid(3, 3);
+        m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f, glm::vec3(-10000.0f, 0.1f, -10000.0f), glm::vec3(10000.0f, 10000.0f, 10000.0f));
 
-        m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f, glm::vec3(-10000.0f, 5.0f, -10000.0f), glm::vec3(10000.0f, 5000.0f, 10000.0f));
+        m_pGrid = new Grid(gridLength, gridWidth);
+
+        glm::vec3 tl = glm::vec3(-10000.0f, -10000.0f, -10000.0f);
+        m_pGrass = new Plane(tl, -tl, CellType::GRASS, tl.x / 100.0f, tl.x / 100.0f, -5.0f);
+
+        m_pSkybox = new Skybox();
     }
 
     printf("Successfully initialized City Sample\n");
@@ -115,7 +125,8 @@ void CitySample::_renderImGui()
 
     ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
 
-    ImGui::Separator();
+    ImGui::DragInt("Grid Length", &gridLength);
+    ImGui::DragInt("Grid Width", &gridWidth);
 
     m_pCamera->renderImGui();
 
@@ -139,14 +150,14 @@ void CitySample::_renderImGui()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-float CitySample::_citadelPiecePulse(float t)
+float CitySample::_citadelPiecePulse(float t) const
 {
     if (t < m_citadelSlamFraction * m_citadelPulseWidth)
         return m_citadelStartingYValue + m_citadelTranslation * t / (m_citadelSlamFraction * m_citadelPulseWidth);
     return m_citadelStartingYValue + m_citadelTranslation * (m_citadelPulseWidth - t) / ((1.0 - m_citadelSlamFraction) * m_citadelPulseWidth);
 }
 
-float CitySample::_calculateCitadelPieceHammer()
+float CitySample::_calculateCitadelPieceHammer() const
 {
     float t = fmod(m_time + m_citadelPhaseShift, m_citadelTotalPeriod);
     if (t > (m_citadelTotalPeriod - m_citadelPulseWidth))
@@ -156,7 +167,7 @@ float CitySample::_calculateCitadelPieceHammer()
 
 void CitySample::_setCitadelToDefaultValues()
 {
-    m_citadelScale = 0.05f;
+    m_citadelScale = 0.01f;
     m_citadelTotalPeriod = 6.494; // Citadel should hammer down every 6.494s
     m_citadelPhaseShift = 1.0f; // Need offset to sync up with sound
     m_citadelStartingYValue = (23500.0f * m_citadelScale);
@@ -176,7 +187,8 @@ void CitySample::update(float dt)
 
     if (!m_renderDebugUI || (m_pApp->isKeyDown(341) || m_pApp->isKeyDown(345))) { // also probably not the best, but it works!
         m_pCamera->update(dt);
-        m_pApp->setCaptureCursor(true);
+        //TODO: switch this back \|/ -> m_pApp->setCaptureCursor(true);
+        m_pApp->setCaptureCursor(false);
     } else {
         m_pCamera->updateMousePosition(); // this fixes the camera angle changing wildly with the mouse pos upon toggling debug UI
         m_pApp->setCaptureCursor(false);
@@ -188,6 +200,7 @@ void CitySample::update(float dt)
 
 void CitySample::render(int width, int height)
 {
+    glEnable(GL_DEPTH_TEST);
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -195,12 +208,12 @@ void CitySample::render(int width, int height)
     glm::mat4 mView = m_pCamera->getViewMatrix();
 
     // Render the Citadel, minus the moving piece
-    glm::mat4 mWorldCitadel = glm::rotate(glm::mat4(1.0f), -PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 mWorldCitadel = glm::rotate(glm::mat4(1.0f), PI / 2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     mWorldCitadel = glm::scale(mWorldCitadel, glm::vec3(m_citadelScale, m_citadelScale, m_citadelScale));
     m_pCitadel->Render(mWorldCitadel, mView, mProj);
 
     // Render the moving piece of Citadel
-    glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI / 2.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), PI / 2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldCitadelPiece;
     mWorldCitadelPiece = glm::scale(mWorldCitadelPiece, glm::vec3(m_citadelScale, m_citadelScale, m_citadelScale));
     mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3((250.0f * m_citadelScale), _calculateCitadelPieceHammer(), (-1000.0f * m_citadelScale))) * mWorldCitadelPiece;
@@ -229,6 +242,10 @@ void CitySample::render(int width, int height)
     // m_pSkyscraper->Render(mWorldSkyscraper, mView, mProj);
 
     m_pGrid->render(mProj, mView);
+
+    m_pGrass->render(mProj, mView);
+
+    m_pSkybox->render(mProj, mView);
 
     if (m_renderDebugUI)
         _renderImGui();

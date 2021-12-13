@@ -1,10 +1,10 @@
 #ifndef S_GRID_H
 #define S_GRID_H
 
-#include <set>
 #include <vector>
 
 #include "glm/glm.hpp"
+
 #include "Plane.h"
 #include "Building.h"
 
@@ -12,6 +12,7 @@ class Grid
 {
 public:
     Grid(int width, int height);
+    ~Grid();
 
     void render(glm::mat4 &mProj, const glm::mat4 &mView) const;
     void renderImGui();
@@ -20,14 +21,6 @@ private:
     void _fillBlock(const glm::vec3 &tl, const glm::vec3 &br);
     void _makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr);
 
-    static int blockLen;
-    static int subblockLen;
-    static float cellLen;
-    static float realSubblockLen;
-
-    static int maxInland;
-
-    static float bldgMinArea;
     static float bldgMinHeight;
     static float bldgMaxHeight;
 
@@ -52,6 +45,8 @@ private:
 
     static float blockRoadWidthTrue;
     static float blockRoadLengthTrue;
+
+    Plane *m_pConcrete = nullptr;
 
     std::vector<Building> m_buildings;
     std::vector<Plane> m_planes;

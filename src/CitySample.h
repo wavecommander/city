@@ -8,6 +8,7 @@
 
 #include "FirstPersonCamera.h"
 #include "Grid.h"
+#include "Skybox.h"
 #include "types.h"
 
 class CitySample : public Sample
@@ -26,17 +27,24 @@ private:
     void _initAudio();
     void _renderImGui();
     void _handle_keys();
-    float _calculateCitadelPieceHammer();
-    float _citadelPiecePulse(float t);
+    float _calculateCitadelPieceHammer() const;
+    float _citadelPiecePulse(float t) const;
     void _setCitadelToDefaultValues();
 
+    static int gridLength;
+    static int gridWidth;
+
     float m_time = 0.0f;
-    ImVec4 m_clearColor = ImVec4(0.0, 0.0, 0.0, 0.0);
+    ImVec4 m_clearColor = ImVec4(0.3529f, 0.8627f, 1.0f, 1.0f);;
     bool m_showDemoWindow = false;
+
+    FirstPersonCamera *m_pCamera = nullptr;
 
     Grid *m_pGrid = nullptr;
 
-    FirstPersonCamera *m_pCamera = nullptr;
+    Plane *m_pGrass = nullptr;
+
+    Skybox *m_pSkybox = nullptr;
 
     wolf::Model *m_pCitadel = nullptr;
     wolf::Model *m_pCitadelPiece = nullptr;

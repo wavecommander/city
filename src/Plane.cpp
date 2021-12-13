@@ -1,24 +1,34 @@
-#include "glm/fwd.hpp"
 #include "types.h"
 #include "Plane.h"
 
-Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  PLANE_TYPE type)
+Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType type, float ru, float rv, float y)
 {
-    glm::vec3 bottomLeft = topLeft + glm::vec3(0.0f, 0.0f, (bottomRight.z - topLeft.z));
-    glm::vec3 topRight = topLeft + glm::vec3((bottomRight.x - topLeft.x), 0.0f, 0.0f);
+    glm::vec3 tl = topLeft;
+    glm::vec3 br = bottomRight;
+    glm::vec3 bl = tl + glm::vec3(0.0f, 0.0f, (br.z - tl.z));
+    glm::vec3 tr = tl + glm::vec3((br.x - tl.x), 0.0f, 0.0f);
 
-    if(type == PLANE_TYPE::PT_ROAD) {
-        m_repeatU = 2.0f;
-        m_repeatV = 2.0f;
+    if(type == CellType::ROAD_Z) { // switch vectors around for texture coords to work out
+        glm::vec3 tmp1, tmp2;
+        tmp1 = bl;
+        bl = tl;
+
+        tmp2 = br;
+        br = tmp1;
+
+        tmp1 = tr;
+        tr = tmp2;
+
+        tl = tmp1;
     }
 
     Vertex vertices[] = {
-        Vertex { bottomLeft.x, 0.0f, bottomLeft.z, 0.0f, 0.0f },
-        Vertex { topLeft.x, 0.0f, topLeft.z, 0.0f, m_repeatV },
-        Vertex { topRight.x, 0.0f, topRight.z, m_repeatU, m_repeatV },
-        Vertex { topRight.x, 0.0f, topRight.z, m_repeatU, m_repeatV },
-        Vertex { bottomRight.x, 0.0f, bottomRight.z, m_repeatU, 0.0f },
-        Vertex { bottomLeft.x, 0.0f, bottomLeft.z, 0.0f, 0.0f },
+        Vertex { bl.x, y, bl.z, 0.0f, 0.0f },
+        Vertex { tl.x, y, tl.z, 0.0f, rv },
+        Vertex { tr.x, y, tr.z, ru, rv },
+        Vertex { tr.x, y, tr.z, ru, rv },
+        Vertex { br.x, y, br.z, ru, 0.0f },
+        Vertex { bl.x, y, bl.z, 0.0f, 0.0f },
     };
     m_pVB = wolf::BufferManager::CreateVertexBuffer(vertices, sizeof(Vertex) * NUM_VERTS);
 
@@ -33,38 +43,48 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  PLANE_TYPE
     std::string texPath = "data/";
 
     switch (type) {
-        case PLANE_TYPE::PT_ROAD:
+        case CellType::ROAD_X:
+        case CellType::ROAD_Z:
         matName += "roadMat";
-        texPath += "road_tex0.jpg";
+        texPath += "road_tex0.png";
         break;
 
-        case PLANE_TYPE::PT_INTER:
+        case CellType::INTER:
         matName += "interMat";
         texPath += "inter_tex.png";
         break;
 
-        case PLANE_TYPE::PT_GRASS:
+        case CellType::GRASS:
         matName += "grassMat";
-        if(rand() % 2 == 0) texPath += "grass_tex0.jpg";
-        else texPath += "grass_tex1.jpg";
+        texPath += "grass_tex1.png";
         break;
 
-        case PLANE_TYPE::PT_ASPHALT:
+        case CellType::CONCRETE:
+        default:
+        matName += "concreteMat";
+        texPath += "concrete_tex.png";
+        break;
+
+        case CellType::ASPHALT:
         matName += "asphaltMat";
-        texPath += "asphalt_tex.jpg";
+        texPath += "asphalt_tex.png";
         break;
     }
 
     m_pTex = wolf::TextureManager::CreateTexture(texPath);
     m_pTex->SetWrapMode(wolf::Texture::WM_Repeat);
 
-    if(type == PLANE_TYPE::PT_ROAD) m_pTex->SetWrapMode(wolf::Texture::WM_MirroredRepeat);
+    if(type == CellType::ROAD_X || type == CellType::ROAD_Z) m_pTex->SetWrapMode(wolf::Texture::WM_MirroredRepeat);
 
     m_pMat = wolf::MaterialManager::CreateMaterial(matName);
     m_pMat->SetTexture("tex", m_pTex);
     m_pMat->SetProgram("data/plane.vsh", "data/plane.fsh");
     m_pMat->SetDepthTest(true);
     m_pMat->SetDepthWrite(true);
+}
+
+Plane::~Plane()
+{
 }
 
 void Plane::render(glm::mat4 &mProj, const glm::mat4 &mView) const
@@ -76,9 +96,4 @@ void Plane::render(glm::mat4 &mProj, const glm::mat4 &mView) const
 	m_pDecl->Bind();
 
 	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
-}
-
-void Plane::renderImGui()
-{
-
 }

@@ -1,5 +1,3 @@
-#include <iostream>
-#include <stdio.h>
 #include <random>
 #include <time.h>
 

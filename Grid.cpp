@@ -1,14 +1,16 @@
+#include <iostream>
+#include <math.h>
 #include <vector>
 
+#include "../wolf/wolf.h"
 #include "glm/fwd.hpp"
 #include <imgui.h>
-#include "../wolf/wolf.h"
 
 #include "Building.h"
+#include "Grid.h"
 #include "Plane.h"
 #include "types.h"
 #include "utils.h"
-#include "Grid.h"
 
 #define VPAIR_T std::pair<glm::vec3, glm::vec3>
 
@@ -218,11 +220,6 @@ Grid::Grid(int length, int width)
     }
 }
 
-Grid::~Grid()
-{
-    delete m_pConcrete;
-}
-
 void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
 {
     int w = 8, l = 16;
@@ -280,10 +277,6 @@ void Grid::renderImGui()
         ImGui::DragFloat("Max Height", &bldgMaxHeight);
         ImGui::DragFloat("Height Spread", &Building::heightSpread);
 
-        if (ImGui::BeginTable("Member Variables", 3)) {
-
-        }
-
         for (Building bldg : m_buildings) {
             bldg.renderImGui();
         }
@@ -292,6 +285,11 @@ void Grid::renderImGui()
     ImGui::Separator();
 
     ImGui::Text("Num Planes: %lu", m_planes.size());
+    if (ImGui::CollapsingHeader("Planes")) {
+        for (Plane plane : m_planes) {
+            plane.renderImGui();
+        }
+    }
 
     ImGui::Separator();
 

@@ -1,7 +1,3 @@
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include <imgui.h>
 #include "../wolf/wolf.h"
 

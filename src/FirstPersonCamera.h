@@ -49,7 +49,7 @@ private:
         FOV_STEP = 0.05f,
         MAX_FOV = 1.5f,
         MIN_FOV = 0.01f,
-        NEAR_PLANE = 0.1f,
+        NEAR_PLANE = 0.01f,
         FAR_PLANE = 100000.0f;
 
     float m_rotX = 0.0f;
