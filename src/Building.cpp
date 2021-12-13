@@ -1,7 +1,4 @@
-#include "assimp/StringUtils.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/vector_float3.hpp"
-#include "glm/fwd.hpp"
+#include <string>
 
 #include "types.h"
 #include "Building.h"
@@ -11,12 +8,15 @@ float Building::maxHeight = 1000.0f;
 
 glm::vec3 Building::downtown = glm::vec3(0.0f,0.0f,0.0f);
 
-Building::Building(const glm::vec3 &position, int length, int width, float height)
+constexpr GLfloat Building::VERTICES[];
+
+Building::Building(const glm::vec3 &position, int length, int width)
     :m_length(length)
     ,m_width(width)
-    ,m_height(height)
 {
-    m_position = glm::vec3(position.x, position.y + (height / 2.0f), position.z);
+    m_height = _calculateHeight();
+
+    m_position = glm::vec3(position.x, position.y + (m_height / 2.0f), position.z);
 
     Vertex vertices[NUM_VERTS];
 
@@ -96,7 +96,7 @@ Building::Building(const glm::vec3 &position, int length, int width, float heigh
     std::string matName = "bldg_mat";
     std::string texPath = "data/bldg_tex";
 
-    std::string choice = to_string(rand() % NUM_TEXTURES);
+    std::string choice = std::to_string(rand() % NUM_TEXTURES);
     texPath += choice + ".jpg";
     matName += choice;
 
@@ -113,11 +113,6 @@ Building::Building(const glm::vec3 &position, int length, int width, float heigh
     // setup material for
     m_pTex2 = wolf::TextureManager::CreateTexture(texPath);
     m_pTex2->SetWrapMode(wolf::Texture::WM_Repeat);
-}
-
-Building::~Building()
-{
-    delete m_pDecl;
 }
 
 void Building::render(glm::mat4 &mProj, const glm::mat4 &mView) const
@@ -160,7 +155,8 @@ void Building::setDowntown(const glm::vec3 &downtown)
     Building::downtown = downtown;
 }
 
-void Building::_calculateHeight()
+float Building::_calculateHeight()
 {
-    float dist = (downtown - m_position).length();
+    float dist = glm::distance(m_position, downtown);
+    return dist;
 }

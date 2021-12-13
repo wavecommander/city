@@ -1,14 +1,32 @@
 #include <math.h>
+#include <ostream>
 #include <vector>
+#include <iostream>
 
+#include "../wolf/wolf.h"
 #include "glm/detail/qualifier.hpp"
 #include "glm/fwd.hpp"
-#include "../wolf/wolf.h"
+#include <imgui.h>
 
-#include "utils.h"
 #include "Building.h"
-#include "Road.h"
 #include "Grid.h"
+#include "Plane.h"
+#include "utils.h"
+
+#define VPAIR_T std::pair<glm::vec3, glm::vec3>
+
+enum cellType
+{
+    UNSET = 0,
+    GRASS,
+    ASPHALT,
+    INTERS,
+    ROAD_X,
+    ROAD_Z,
+    N_BASIC
+};
+
+int buildingIDStart = 8;
 
 int Grid::blockLen = 5;
 int Grid::subblockLen = 32;
@@ -21,145 +39,246 @@ float Grid::bldgMinArea = cellLen * 8;
 float Grid::bldgMinHeight = 10.0f;
 float Grid::bldgMaxHeight = 500.f;
 
+float Grid::centreX = 0.0f;
+float Grid::centreZ = 0.0f;
+float Grid::cellSideLength = 1.0f;
+
+int Grid::extraCitadelBlockPaddingX = 0; // 0 means just centre is reserved
+int Grid::extraCitadelBlockPaddingZ = 0;
+
+float Grid::roadWidth = 1.0f;
+int Grid::blockWidth = 128; // in cells
+int Grid::blockLength = 128; // in cells
+
+int Grid::blockCornerSpecial = 16; // in cells
+
+float Grid::blockWidthTrue = blockWidth * cellSideLength;
+float Grid::blockLengthTrue = blockLength * cellSideLength;
+
+float Grid::blockWidthOffsetTrue = -blockWidthTrue / 2.0f;
+float Grid::blockLengthOffsetTrue = -blockLengthTrue / 2.0f;
+
+float Grid::blockRoadWidthTrue = blockWidthTrue + roadWidth;
+float Grid::blockRoadLengthTrue = blockLengthTrue + roadWidth;
+
+std::vector<VPAIR_T> plots;
+
 Grid::Grid(int length, int width)
 {
-    if(subblockLen % 2 != 0) ++subblockLen;
+    int numCitadelBlocks = (1 + 2 * extraCitadelBlockPaddingX) * (1 + 2 * extraCitadelBlockPaddingZ);
 
-    maxRecurse = 0;
-    float f = (blockLen-1) * realSubblockLen / 2.0;
-    while(f > bldgMinArea) {
-        f /= 2;
-        ++maxRecurse;
-    }
+    // Both corners kept to allow for future changes
+    glm::vec3 blockCorners[length * width * 2 /*- numCitadelBlocks*/]; // tl(x0, z0), br(x1, z1)
+    glm::vec3 intersectionCorners[(length + 1) * (width + 1) * 2];
+    glm::vec3 roadsGoingXCorners[(length + 1) * (width + 1) * 2];
+    glm::vec3 roadsGoingZCorners[(length + 1) * (width + 1) * 2];
 
-    int tlbBlockLength = length * blockLen;
-    int tlbBlockWidth = width * blockLen;
-    float tlbUnitLen = blockLen * subblockLen * cellLen;
+    int nBlocksValid = 0;
+    int nIntersectionsValid = 0;
+    int nRoadsGoingXValid = 0;
+    int nRoadsGoingZValid = 0;
 
-    int citadelStartY = tlbBlockWidth / 2;
-    int citadelStartX = tlbBlockLength / 2;
-    int citadelEndY = citadelStartY;
-    int citadelEndX = citadelStartX;
+    int blockStartXIndex = -length / 2;
+    int blockStartZIndex = -width / 2;
+    int citadelBlockXIndex = 0;
+    int citadelBlockZIndex = 0;
+    int blockEndXIndex = length + blockStartXIndex;
+    int blockEndZIndex = width + blockStartZIndex;
 
-    if(length % 2 == 0) {
-        citadelStartX--;
-    }
-    if(width % 2 == 0) {
-        citadelStartY--;
-    }
+    glm::vec3 blockSpan = glm::vec3(blockWidthTrue, 0.0f, blockWidthTrue);
+    glm::vec3 intersectionSpan = glm::vec3(roadWidth, 0.0f, roadWidth);
+    glm::vec3 roadsGoingXSpan = glm::vec3(blockWidthTrue, 0.0f, roadWidth);
+    glm::vec3 roadsGoingZSpan = glm::vec3(roadWidth, 0.0f, blockWidthTrue);
 
-    for(int tlbZ = 0; tlbZ < width; ++tlbZ) {
-        float bZ = tlbZ * tlbUnitLen;
-        for(int tlbX = 0; tlbX < length; ++tlbX) {
-            float bX = tlbX * tlbUnitLen;
+    float x;
+    float z;
 
-            if((citadelStartX <= tlbX && tlbX <= citadelEndX) && (citadelStartY <= tlbZ && tlbZ <= citadelEndY)) { // if block is reserved for citadel
+    for (int i = blockStartXIndex; i < blockEndXIndex; ++i) {
+        x = blockWidthOffsetTrue + i * blockRoadWidthTrue; // block + road
+
+        for (int k = blockStartZIndex; k < blockEndZIndex; ++k) {
+            z = blockLengthOffsetTrue + k * blockRoadLengthTrue; // block + road
+
+                std::cout << "i" << i << ";k" << k << std::endl;
+                std::cout << "x" << x << ";z" << z << std::endl;
+                std::cout << "NIV" << nIntersectionsValid << ";NBV" << nBlocksValid << ";XRGV" << nRoadsGoingXValid << ";ZRGV" << nRoadsGoingZValid << std::endl;
+
+
+            if (-extraCitadelBlockPaddingX <= i && i < extraCitadelBlockPaddingX
+                && -extraCitadelBlockPaddingZ <= k && k < extraCitadelBlockPaddingZ) {
+                // In Citadel Exclusion Zone Inner Block (if there are any
+            } else if ((i == extraCitadelBlockPaddingX)
+                && -extraCitadelBlockPaddingZ <= k && k <= extraCitadelBlockPaddingZ) {
+                // In Citadel Exclusion Zone Edge
+
+                if (k == blockStartZIndex) { // Before first
+                    intersectionCorners[nIntersectionsValid * 2 + 1] = glm::vec3(x, 0.0f, z);
+                    intersectionCorners[nIntersectionsValid * 2] = intersectionCorners[nIntersectionsValid * 2 + 1] - intersectionSpan;
+                    ++nIntersectionsValid; // Special
+                }
+
+                intersectionCorners[nIntersectionsValid * 2] = glm::vec3(x, 0.0f, z) + blockSpan;
+                intersectionCorners[nIntersectionsValid * 2 + 1] = intersectionCorners[nIntersectionsValid * 2] + intersectionSpan;
+                ++nIntersectionsValid;
+
+                if (i == blockStartXIndex) { // Before first
+                    roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x - roadWidth, 0.0f, z);
+                    roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
+                    ++nRoadsGoingZValid; // Special
+                }
+
+                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockWidthTrue, 0.0f, z);
+                roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
+                ++nRoadsGoingZValid;
+
+            } else if (-extraCitadelBlockPaddingX <= i && i <= extraCitadelBlockPaddingX
+                && k <= extraCitadelBlockPaddingZ) {
+                // In Citadel Exclusion Zone Edge
+
+                if (k == blockStartZIndex) { // Before first
+                    intersectionCorners[nIntersectionsValid * 2 + 1] = glm::vec3(x, 0.0f, z);
+                    intersectionCorners[nIntersectionsValid * 2] = intersectionCorners[nIntersectionsValid * 2 + 1] - intersectionSpan;
+                    ++nIntersectionsValid; // Special
+                }
+
+                intersectionCorners[nIntersectionsValid * 2] = glm::vec3(x, 0.0f, z) + blockSpan;
+                intersectionCorners[nIntersectionsValid * 2 + 1] = intersectionCorners[nIntersectionsValid * 2] + intersectionSpan;
+                ++nIntersectionsValid;
+
+                if (k == blockStartZIndex) { // Before first
+                    roadsGoingXCorners[nRoadsGoingXValid * 2] = glm::vec3(x, 0.0f, z - roadWidth);
+                    roadsGoingXCorners[nRoadsGoingXValid * 2 + 1] = roadsGoingXCorners[nRoadsGoingXValid * 2] + roadsGoingXSpan;
+                    ++nRoadsGoingXValid; // Special
+                }
+
+                roadsGoingXCorners[nRoadsGoingXValid * 2] = glm::vec3(x, 0.0f, z + blockWidthTrue);
+                roadsGoingXCorners[nRoadsGoingXValid * 2 + 1] = roadsGoingXCorners[nRoadsGoingXValid * 2] + roadsGoingXSpan;
+                ++nRoadsGoingXValid;
 
             } else {
-                _generateTLBRoads(bX, bZ);
-                _generateTLBBldgs(bX, bZ);
+                blockCorners[nBlocksValid * 2] = glm::vec3(x, 0.0f, z);
+                blockCorners[nBlocksValid * 2 + 1] = blockCorners[nBlocksValid * 2] + blockSpan;
+                ++nBlocksValid;
+
+                if (k == blockStartZIndex) { // Before first
+                    intersectionCorners[nIntersectionsValid * 2 + 1] = glm::vec3(x, 0.0f, z);
+                    intersectionCorners[nIntersectionsValid * 2] = intersectionCorners[nIntersectionsValid * 2 + 1] - intersectionSpan;
+                    ++nIntersectionsValid; // Special
+                }
+
+                intersectionCorners[nIntersectionsValid * 2] = glm::vec3(x, 0.0f, z) + blockSpan;
+                intersectionCorners[nIntersectionsValid * 2 + 1] = intersectionCorners[nIntersectionsValid * 2] + intersectionSpan;
+                ++nIntersectionsValid;
+
+                if (k == blockStartZIndex) { // Before first
+                    roadsGoingXCorners[nRoadsGoingXValid * 2] = glm::vec3(x, 0.0f, z - roadWidth);
+                    roadsGoingXCorners[nRoadsGoingXValid * 2 + 1] = roadsGoingXCorners[nRoadsGoingXValid * 2] + roadsGoingXSpan;
+                    ++nRoadsGoingXValid; // Special
+                }
+
+                roadsGoingXCorners[nRoadsGoingXValid * 2] = glm::vec3(x, 0.0f, z + blockWidthTrue);
+                roadsGoingXCorners[nRoadsGoingXValid * 2 + 1] = roadsGoingXCorners[nRoadsGoingXValid * 2] + roadsGoingXSpan;
+                ++nRoadsGoingXValid;
+
+                if (i == blockStartXIndex) { // Before first
+                    roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x - roadWidth, 0.0f, z);
+                    roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
+                    ++nRoadsGoingZValid; // Special
+                }
+
+                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockWidthTrue, 0.0f, z);
+                roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
+                ++nRoadsGoingZValid;
             }
         }
     }
-}
 
-Grid::~Grid()
-{
+    std::cout << "\nmadeit\n";
 
-}
-
-void Grid::_generateTLBRoads(float bX, float bZ)
-{
-    glm::vec3 rd0tl = glm::vec3(bX, 0.0f, bZ);
-    glm::vec3 rd0br = rd0tl + glm::vec3((blockLen-1) * realSubblockLen, 0.0f, realSubblockLen);
-    m_roads.push_back(Road(rd0tl, rd0br, false));
-
-    glm::vec3 intertl = glm::vec3(rd0br.x, 0.0f, rd0tl.z);
-    glm::vec3 interbr = intertl + glm::vec3(realSubblockLen, 0.0f, realSubblockLen);
-    m_roads.push_back(Road(intertl, interbr, true));
-
-    glm::vec3 rd1br = rd0br + glm::vec3(realSubblockLen, 0.0f, (blockLen-1) * realSubblockLen);
-    m_roads.push_back(Road(rd0br, rd1br, false));
-}
-
-void Grid::_generateTLBBldgs(float bX, float bZ)
-{
-    glm::vec4 roadsDir = glm::vec4(1.0f,1.0f,1.0f,1.0f);
-    int level = 0;
-
-    float totalLen = (blockLen-1) * realSubblockLen;
-    float halfLen = totalLen / 2.0f;
-    glm::vec3 middle = glm::vec3(bX + halfLen, 0.0f, bZ + realSubblockLen + halfLen);
-
-    glm::vec3 b0tl = glm::vec3(bX, 0.0f, bZ + realSubblockLen);
-    _fillSubsection(b0tl, middle, roadsDir, level);
-
-    glm::vec3 b1tl = b0tl + glm::vec3(totalLen, 0.0f, 0.0f);
-    _fillSubsection(b1tl, middle, roadsDir, level);
-
-    glm::vec3 b2tl = b0tl + glm::vec3(0.0f, 0.0f, totalLen);
-    _fillSubsection(b2tl, middle, roadsDir, level);
-
-    glm::vec3 b3tl = b2tl + glm::vec3(totalLen, 0.0f, 0.0f);
-    _fillSubsection(b3tl, middle, roadsDir, level);
-}
-
-void Grid::_fillSubsection(const glm::vec3 &tl, const glm::vec3 &br, const glm::vec4 & roadsDir, int level)
-{
-    float length = br.x - tl.x;
-    float width = br.z - tl.z;
-
-    float halfLength = length / 2.0f;
-    float halfWidth = width / 2.0f;
-
-    float area = length * width;
-
-    if(area <= bldgMinArea) {
-        glm::vec3 center = tl + glm::vec3(halfLength, 0.0f, halfWidth);
-        m_buildings.push_back(Building(center, length, width, wolf::randFloat(bldgMinHeight, bldgMaxHeight)));
-        return;
+    // Make stuff
+    for (int i = 0; i < nBlocksValid; ++i) {
+        _fillBlock(blockCorners[i * 2], blockCorners[i * 2 + 1]);
     }
 
-    if(level >= maxRecurse) { // subdivide subsection into bldgs
-        float plotSize = wolf::randFloat(sqrt(bldgMinArea), halfLength);
-        int len = (int)(length / plotSize);
-
-        int stZ, endZ, stX, endX;
-
-        for(int i = stZ; i < endZ; ++i) {
-            for(int j = stX; j < endX; ++j) {
-                int inland = randInt(0, maxInland);
-
-                glm::vec3 pos = glm::vec3();
-                m_buildings.push_back(Building(pos, length, width, wolf::randFloat(bldgMinHeight, bldgMaxHeight)));
-            }
-        }
-
-        return;
+    // Intersections, roads (in X and in Z) are similarly looped over
+    for (int i = 0; i < nIntersectionsValid; ++i) {
+        int tli = i * 2;
+        int bri = tli + 1;
+        m_planes.push_back(Plane(intersectionCorners[tli], intersectionCorners[bri], Plane::PLANE_TYPE::PT_INTER));
     }
 
-    glm::vec3 ss0br = tl + glm::vec3(halfLength, 0.0f, halfWidth);
-    glm::vec3 ss1tl, ss1br, ss2tl, ss2br, ss3tl, ss3br;
-
-    //
-    _fillSubsection(tl, ss0br, level+1);
-
-    if(rand() % 2 == 0) {
-        ss1tl = tl + glm::vec3(halfLength, 0.0f, 0.0f);
-        ss1br = ss0br + glm::vec3(0.0f, 0.0f, halfLength);
-    } else {
-
+    for (int i = 0; i < nRoadsGoingXValid; ++i) {
+        int tli = i * 2;
+        int bri = tli + 1;
+        m_planes.push_back(Plane(roadsGoingXCorners[tli], roadsGoingXCorners[bri], Plane::PLANE_TYPE::PT_ROAD));
     }
-    _fillSubsection(ss1tl, ss1br, level+1);
-    _fillSubsection(ss2tl, ss2br, level+1);
 
+    for (int i = 0; i < nRoadsGoingZValid; ++i) {
+        int tli = i * 2;
+        int bri = tli + 1;
+        m_planes.push_back(Plane(roadsGoingZCorners[tli], roadsGoingZCorners[bri], Plane::PLANE_TYPE::PT_ROAD));
+    }
 }
 
-void Grid::_fillssblock(const glm::vec3 &tl, const glm::vec3 &br)
+void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
 {
+    int w = 4, l = 8;
+
+    int nX = blockLength / w;
+    int nZ = blockWidth / w;
+
+    for (int i = 0; i < nX; ++i) {
+        glm::vec3 shift = glm::vec3(i * w * cellSideLength, 0.0f, 0.0f);
+        glm::vec3 span = glm::vec3(w * cellSideLength, 0.0f, l * cellSideLength);
+
+        _makeBldg(tl + shift, tl + shift + span);
+        _makeBldg(br - shift - span, br - shift);
+    }
+    for (int j = l / w; j < nZ - l / w; ++j) {
+        glm::vec3 shift = glm::vec3(0.0f, 0.0f, j * w * cellSideLength);
+        glm::vec3 span = glm::vec3(l * cellSideLength, 0.0f, w * cellSideLength);
+
+        _makeBldg(tl + shift, tl + shift + span);
+        _makeBldg(br - shift - span, br - shift);
+    }
+}
+
+void Grid::_makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr)
+{
+    glm::vec3 nc = ntl + nbr;
+    glm::vec3 center = glm::vec3(nc.x / 2.0f, nc.y / 2.0f, nc.z / 2.0f);
+    m_buildings.push_back(Building(center, nbr.x - ntl.x, nbr.z - ntl.z));
+}
+
+void Grid::render(glm::mat4 &mProj, const glm::mat4 &mView) const
+{
+    for (Building bldg : m_buildings) {
+        bldg.render(mProj, mView);
+    }
+
+    for (Plane plane : m_planes) {
+        plane.render(mProj, mView);
+    }
 }
 
 void Grid::renderImGui()
 {
+    if (!ImGui::CollapsingHeader("City Grid"))
+        return;
 
+    ImGui::Text("Num Buildings: %lu", m_buildings.size());
+    if (ImGui::CollapsingHeader("Buildings")) {
+        for (Building bldg : m_buildings) {
+            bldg.renderImGui();
+        }
+    }
+
+    ImGui::Separator();
+
+    ImGui::Text("Num Planes: %lu", m_planes.size());
+    if (ImGui::CollapsingHeader("Planes")) {
+        for (Plane plane : m_planes) {
+            plane.renderImGui();
+        }
+    }
 }

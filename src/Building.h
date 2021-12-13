@@ -7,8 +7,7 @@
 class Building
 {
 public:
-    Building(const glm::vec3 &position, int length, int width, float height);
-    ~Building();
+    Building(const glm::vec3 &position, int length, int width);
 
     static void setMinMaxHeight(float minHeight, float maxHeight);
     static void setDowntown(const glm::vec3 &downtown);
@@ -17,7 +16,7 @@ public:
     void renderImGui();
 
 private:
-    void _calculateHeight();
+    float _calculateHeight();
 
     static constexpr int NUM_VERTS = 3 * 2 * 6;
 
@@ -34,8 +33,7 @@ private:
 
     glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
 
-    static wolf::VertexBuffer *m_pVB;
-
+    wolf::VertexBuffer *m_pVB = nullptr;
     wolf::VertexDeclaration *m_pDecl = nullptr;
     wolf::Texture *m_pTex1 = nullptr;
     wolf::Texture *m_pTex2 = nullptr;

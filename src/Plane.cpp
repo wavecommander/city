@@ -67,11 +67,6 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  PLANE_TYPE
     m_pMat->SetDepthWrite(true);
 }
 
-Plane::~Plane()
-{
-    delete m_pDecl;
-}
-
 void Plane::render(glm::mat4 &mProj, const glm::mat4 &mView) const
 {
     m_pMat->SetUniform("projection", mProj);

@@ -16,7 +16,6 @@ public:
     };
 
     Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  PLANE_TYPE type);
-    ~Plane();
 
     void render(glm::mat4 &mProj, const glm::mat4 &mView) const;
     void renderImGui();
