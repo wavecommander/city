@@ -7,6 +7,7 @@
 #include "../wolf/wolf.h"
 
 #include "FirstPersonCamera.h"
+#include "Grid.h"
 #include "types.h"
 
 class CitySample : public Sample
@@ -32,6 +33,8 @@ private:
     float m_time = 0.0f;
     ImVec4 m_clearColor = ImVec4(0.0, 0.0, 0.0, 0.0);
     bool m_showDemoWindow = false;
+
+    Grid *m_pGrid = nullptr;
 
     FirstPersonCamera *m_pCamera = nullptr;
 

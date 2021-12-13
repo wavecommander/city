@@ -18,6 +18,7 @@ CitySample::CitySample(wolf::App *pApp)
 CitySample::~CitySample()
 {
     printf("Destroying City Sample\n");
+    delete m_pGrid;
     delete m_pCamera;
 
     delete m_pCitadel;
@@ -43,6 +44,8 @@ void CitySample::init()
         // m_pOffice = new wolf::Model("data/office.fbx");
         // m_pFactory = new wolf::Model("data/factor.fbx");
         // m_pSkyscraper = new wolf::Model("data/skyscraper.fbx");
+
+        m_pGrid = new Grid(3, 3);
 
         m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f, glm::vec3(-10000.0f, 5.0f, -10000.0f), glm::vec3(10000.0f, 5000.0f, 10000.0f));
     }
@@ -126,6 +129,10 @@ void CitySample::_renderImGui()
         ImGui::DragFloat("Slam Fraction", &m_citadelSlamFraction, 0.01, 0.0f, 1.0f, "%.2f");
         if(ImGui::Button("Reset")) _setCitadelToDefaultValues();
     }
+
+    ImGui::Separator();
+
+    m_pGrid->renderImGui();
 
     ImGui::End();
     ImGui::Render();
@@ -220,6 +227,8 @@ void CitySample::render(int width, int height)
     // glm::mat4 mWorldSkyscraper = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     // mWorldSkyscraper = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldSkyscraper;
     // m_pSkyscraper->Render(mWorldSkyscraper, mView, mProj);
+
+    m_pGrid->render(mProj, mView);
 
     if (m_renderDebugUI)
         _renderImGui();
