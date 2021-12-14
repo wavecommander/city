@@ -42,15 +42,15 @@ private:
 
     glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
 
-    static constexpr GLfloat VERTS[] = {
+    static constexpr GLfloat CUBE_VERTS[] = {
 
         // Front
-        -0.5f, -0.5f, 0.5f,
+        0.5f,  0.5f, 0.5f,
         -0.5f,  0.5f, 0.5f,
-        0.5f,  0.5f, 0.5f,
-        0.5f,  0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
         -0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
+        0.5f, -0.5f, 0.5f,
+        0.5f,  0.5f, 0.5f,
 
         // Back
         0.5f,  0.5f,-0.5f,

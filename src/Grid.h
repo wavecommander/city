@@ -19,7 +19,7 @@ public:
 
 private:
     void _fillBlock(const glm::vec3 &tl, const glm::vec3 &br);
-    void _makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr);
+    void _makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr, float density);
 
     static int bldgMinLen;
 

@@ -9,7 +9,7 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType t
     glm::vec3 tr = tl + glm::vec3((br.x - tl.x), 0.0f, 0.0f);
 
     if(type == CellType::ROAD_Z) { // switch vectors around for texture coords to work out
-        glm::vec3 tmp1, tmp2;
+        glm::vec3 tmp1, tmp2;      // could have done it the other way ... but this is what came to mind first
         tmp1 = bl;
         bl = tl;
 

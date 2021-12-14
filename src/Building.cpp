@@ -15,7 +15,7 @@ float Building::maxUV = 1.75f;
 
 glm::vec3 Building::downtown = glm::vec3(0.0f,0.0f,0.0f);
 
-constexpr GLfloat Building::VERTS[];
+constexpr GLfloat Building::CUBE_VERTS[];
 
 Building::Building(const glm::vec3 &position, int length, int width)
     :m_length(length)
@@ -26,10 +26,6 @@ Building::Building(const glm::vec3 &position, int length, int width)
 
 void Building::_init(const glm::vec3 &position)
 {
-    m_position = glm::vec3(position.x, position.y, position.z);
-    m_height = _calculateHeight();
-    m_position.y += (m_height / 2.0f);
-
     // setup material for main bldg texture
     std::string matName = "bldg_mat";
     std::string texPath = "data/bldg_tex";
@@ -38,19 +34,6 @@ void Building::_init(const glm::vec3 &position)
     std::string texIDStr = std::to_string(texID);
     texPath += texIDStr + ".png";
     matName += texIDStr;
-
-    //TODO: dynamically choose U V values for building dimensions and texture chosen
-    switch (texID) {
-        case 0:
-        break;
-
-        case 1:
-        default:
-        break;
-
-        case 2:
-        break;
-    }
 
     m_pTex1 = wolf::TextureManager::CreateTexture(texPath);
     m_pTex1->SetWrapMode(wolf::Texture::WM_Repeat);
@@ -66,27 +49,31 @@ void Building::_init(const glm::vec3 &position)
     m_pTex2 = wolf::TextureManager::CreateTexture("data/gravel_tex.png");
     m_pTex2->SetWrapMode(wolf::Texture::WM_Repeat);
 
+    m_position = glm::vec3(position.x, position.y, position.z);
+    m_height = _calculateHeight();
+    m_position.y += (m_height / 2.0f);
+
+    m_uv = wolf::randFloat(minUV, maxUV);
 
     Vertex vertices[NUM_VERTS];
-    m_uv = wolf::randFloat(minUV, maxUV);
 
     // texture for front, back, left, right faces
     int idx = 0;
     for(int i = 0; i < ROOF_CUTOFF; i += 6) {
         idx = i * 3;
-        vertices[i] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 0.0f, 0.0f};
+        vertices[i] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, 0.0f};
 
         idx = (i+1) * 3;
-        vertices[i+1] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 0.0f, m_uv};
+        vertices[i+1] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, m_uv};
 
         idx = (i+2) * 3;
-        vertices[i+2] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], m_uv, m_uv};
+        vertices[i+2] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_uv, m_uv};
 
         idx = (i+3) * 3;
         vertices[i+3] = vertices[i+2];
 
         idx = (i+4) * 3;
-        vertices[i+4] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], m_uv, 0.0f};
+        vertices[i+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_uv, 0.0f};
 
         idx = (i+5) * 3;
         vertices[i+5] = vertices[i];
@@ -96,19 +83,19 @@ void Building::_init(const glm::vec3 &position)
     // texture for top: gravel
     int st = ROOF_CUTOFF;
     idx = st * 3;
-    vertices[st] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 0.0f, 0.0f};
+    vertices[st] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, 0.0f};
 
     idx += 3;
-    vertices[st+1] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 0.0f, 1.0f};
+    vertices[st+1] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, 1.0f};
 
     idx += 3;
-    vertices[st+2] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 1.0f, 1.0f};
+    vertices[st+2] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 1.0f, 1.0f};
 
     idx += 3;
     vertices[st+3] = vertices[st+2];
 
     idx += 3;
-    vertices[st+4] = Vertex {VERTS[idx], VERTS[idx+1], VERTS[idx+2], 1.0f, 0.0f};
+    vertices[st+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 1.0f, 0.0f};
 
     idx += 3;
     vertices[st+5] = vertices[st];

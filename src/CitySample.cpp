@@ -25,6 +25,8 @@ CitySample::~CitySample()
 
     delete m_pGrid;
 
+    delete m_pSkybox;
+
     delete m_pCitadel;
     delete m_pCitadelPiece;
 
@@ -36,9 +38,6 @@ void CitySample::init()
 {
     if (!m_pCitadel) {
         m_renderDebugUI = false;
-
-        //TODO: remove line; just for debugging
-        m_pApp->setCaptureCursor(false);
 
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
@@ -125,8 +124,8 @@ void CitySample::_renderImGui()
 
     ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
 
-    ImGui::DragInt("Grid Length", &gridLength);
-    ImGui::DragInt("Grid Width", &gridWidth);
+    ImGui::DragInt("Grid Length", &gridLength, 0.5f);
+    ImGui::DragInt("Grid Width", &gridWidth, 0.5f);
 
     m_pCamera->renderImGui();
 
@@ -187,8 +186,7 @@ void CitySample::update(float dt)
 
     if (!m_renderDebugUI || (m_pApp->isKeyDown(341) || m_pApp->isKeyDown(345))) { // also probably not the best, but it works!
         m_pCamera->update(dt);
-        //TODO: switch this back \|/ -> m_pApp->setCaptureCursor(true);
-        m_pApp->setCaptureCursor(false);
+        m_pApp->setCaptureCursor(true);
     } else {
         m_pCamera->updateMousePosition(); // this fixes the camera angle changing wildly with the mouse pos upon toggling debug UI
         m_pApp->setCaptureCursor(false);
@@ -245,7 +243,8 @@ void CitySample::render(int width, int height)
 
     m_pGrass->render(mView, mProj);
 
-    m_pSkybox->render(mView, mProj);
+    // couldn't get skybox to work on time
+    // m_pSkybox->render(mView, mProj);
 
     if (m_renderDebugUI)
         _renderImGui();

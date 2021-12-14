@@ -53,7 +53,7 @@ void Skybox::render(const glm::mat4 &mProj, const glm::mat4 &mView) {
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, sizeof(SKYBOX_VERTS));
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
 }

@@ -24,7 +24,7 @@ float Grid::cellSideLength = 1.0f;
 int Grid::extraCitadelBlockPaddingX = 0; // 0 means just centre is reserved
 int Grid::extraCitadelBlockPaddingZ = 0;
 
-float Grid::roadWidth = 15.0f * cellSideLength;
+float Grid::roadWidth = wolf::randFloat(10.0f, 20.0f) * cellSideLength;
 int Grid::blockWidth = 64; // in cells
 int Grid::blockLength = 64; // in cells
 
@@ -63,25 +63,30 @@ Grid::Grid(int length, int width)
     int blockEndXIndex = length + blockStartXIndex;
     int blockEndZIndex = width + blockStartZIndex;
 
-    glm::vec3 blockSpan = glm::vec3(blockWidthTrue, 0.0f, blockWidthTrue);
+    glm::vec3 blockSpan = glm::vec3(blockLengthTrue, 0.0f, blockWidthTrue);
     glm::vec3 intersectionSpan = glm::vec3(roadWidth, 0.0f, roadWidth);
-    glm::vec3 roadsGoingXSpan = glm::vec3(blockWidthTrue, 0.0f, roadWidth);
+    glm::vec3 roadsGoingXSpan = glm::vec3(blockLengthTrue, 0.0f, roadWidth);
     glm::vec3 roadsGoingZSpan = glm::vec3(roadWidth, 0.0f, blockWidthTrue);
 
-    float totalLength = length * blockRoadLengthTrue;
-    float totalWidth = width * blockRoadWidthTrue;
-    glm::vec3 ttl = glm::vec3(blockStartXIndex - totalLength / 2.0f, 0.0f, blockStartZIndex - totalWidth / 2.0f);
-    glm::vec3 tbr = ttl + glm::vec3(totalLength, 0.0f, totalWidth);
+    float totalLength = length * blockRoadLengthTrue + roadWidth;
+    float totalWidth = width * blockRoadWidthTrue + roadWidth;
+
+    glm::vec3 totalSpan = glm::vec3(totalLength, 0.0f, totalWidth);
+
+
+    glm::vec3 ttl = glm::vec3(blockLengthOffsetTrue + blockStartXIndex * blockRoadLengthTrue, 0.0f,
+                              blockWidthOffsetTrue  + blockStartZIndex * blockRoadWidthTrue) - intersectionSpan;
+    glm::vec3 tbr = ttl + totalSpan;
     m_pConcrete = new Plane(ttl, tbr, CellType::CONCRETE, totalLength / 450.0f, totalWidth / 225.0f, -3.0f);
 
     float x;
     float z;
 
     for (int i = blockStartXIndex; i < blockEndXIndex; ++i) {
-        x = blockWidthOffsetTrue + i * blockRoadWidthTrue; // block + road
+        x = blockLengthOffsetTrue + i * blockRoadLengthTrue; // block + road
 
         for (int k = blockStartZIndex; k < blockEndZIndex; ++k) {
-            z = blockLengthOffsetTrue + k * blockRoadLengthTrue; // block + road
+            z = blockWidthOffsetTrue + k * blockRoadWidthTrue; // block + road
 
             if (-extraCitadelBlockPaddingX <= i && i < extraCitadelBlockPaddingX
                 && -extraCitadelBlockPaddingZ <= k && k < extraCitadelBlockPaddingZ) {
@@ -113,7 +118,7 @@ Grid::Grid(int length, int width)
 //                    ++nRoadsGoingZValid; // Special
 //                }
 
-                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockWidthTrue, 0.0f, z);
+                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockLengthTrue, 0.0f, z);
                 roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
                 ++nRoadsGoingZValid;
 
@@ -185,7 +190,7 @@ Grid::Grid(int length, int width)
                     ++nRoadsGoingZValid; // Special
                 }
 
-                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockWidthTrue, 0.0f, z);
+                roadsGoingZCorners[nRoadsGoingZValid * 2] = glm::vec3(x + blockLengthTrue, 0.0f, z);
                 roadsGoingZCorners[nRoadsGoingZValid * 2 + 1] = roadsGoingZCorners[nRoadsGoingZValid * 2] + roadsGoingZSpan;
                 ++nRoadsGoingZValid;
             }
@@ -277,6 +282,8 @@ void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
 {
     int w = 16, l = 16;
 
+    float d = wolf::randFloat(60.0f, 85.0f);
+
     int nX = blockLength / w;
     int nZ = blockWidth / w;
 
@@ -284,21 +291,21 @@ void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
         glm::vec3 shift = glm::vec3(i * w * cellSideLength, 0.0f, 0.0f);
         glm::vec3 span = glm::vec3(w * cellSideLength, 0.0f, l * cellSideLength);
 
-        _makeBldg(tl + shift, tl + shift + span);
-        _makeBldg(br - shift - span, br - shift);
+        _makeBldg(tl + shift, tl + shift + span, d);
+        _makeBldg(br - shift - span, br - shift, d);
     }
     for (int j = l / w; j < nZ - l / w; ++j) {
         glm::vec3 shift = glm::vec3(0.0f, 0.0f, j * w * cellSideLength);
         glm::vec3 span = glm::vec3(l * cellSideLength, 0.0f, w * cellSideLength);
 
-        _makeBldg(tl + shift, tl + shift + span);
-        _makeBldg(br - shift - span, br - shift);
+        _makeBldg(tl + shift, tl + shift + span, d);
+        _makeBldg(br - shift - span, br - shift, d);
     }
 }
 
-void Grid::_makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr)
+void Grid::_makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr, float density)
 {
-    if (rand() % 3 != 0) {
+    if (wolf::randFloat(0.0f, 100.0f) < density) {
         glm::vec3 nc = ntl + nbr;
         glm::vec3 center = glm::vec3(nc.x / 2.0f, nc.y / 2.0f, nc.z / 2.0f);
 
