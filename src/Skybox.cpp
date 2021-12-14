@@ -12,6 +12,7 @@ constexpr GLfloat Skybox::SKYBOX_VERTS[];
 Skybox::Skybox()
 {
     m_pProgram = wolf::ProgramManager::CreateProgram("data/skybox.vsh", "data/skybox.fsh");
+    m_pProgram->SetUniform("skybox", 0);
 
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
@@ -43,6 +44,7 @@ Skybox::~Skybox()
 
 
 void Skybox::render(const glm::mat4 &mProj, const glm::mat4 &mView) {
+    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     m_pProgram->SetUniform("view", mView);
     m_pProgram->SetUniform("projection", mProj);

@@ -8,39 +8,39 @@ class Building
 {
 public:
     Building(const glm::vec3 &position, int length, int width);
-    ~Building();
 
-    static void setMinMaxHeight(float minHeight, float maxHeight);
-    static void setDowntown(const glm::vec3 &downtown);
-
-    void render(glm::mat4 &mProj, const glm::mat4 &mView) const;
+    void render(glm::mat4 &mView, const glm::mat4 &mProj) const;
     void renderImGui();
 
     static float minHeight, maxHeight, heightSpread;
 
-private:
-    float _calculateHeight() const;
-
-    static constexpr int NUM_VERTS = (3 * 2 * 6) - 6;
-    static constexpr int ROOF_CUTOFF = NUM_VERTS - 6;
-    static constexpr int NUM_TEXTURES = 3;
-
-    float m_length;
-    float m_width;
-    float m_height;
-
-    float m_repeatU = 0.33f;
-    float m_repeatV = 3.0f;
-
     static glm::vec3 downtown;
-
-    glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
 
     wolf::VertexBuffer *m_pVB = nullptr;
     wolf::VertexDeclaration *m_pDecl = nullptr;
     wolf::Texture *m_pTex1 = nullptr;
     wolf::Texture *m_pTex2 = nullptr;
     wolf::Material *m_pMat = nullptr;
+
+private:
+    void _init(const glm::vec3 &position);
+    void _reinit();
+    void _destroyAll();
+    float _calculateHeight() const;
+
+    static constexpr int NUM_VERTS = (3 * 2 * 6) - 6;
+    static constexpr int ROOF_CUTOFF = NUM_VERTS - 6;
+    static constexpr int NUM_TEXTURES = 3;
+
+    static float minUV, maxUV;
+
+    float m_length;
+    float m_width;
+    float m_height;
+
+    float m_uv = 1.0f;
+
+    glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
 
     static constexpr GLfloat VERTS[] = {
 

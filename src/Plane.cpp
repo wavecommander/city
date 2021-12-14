@@ -46,7 +46,7 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType t
         case CellType::ROAD_X:
         case CellType::ROAD_Z:
         matName += "roadMat";
-        texPath += "road_tex0.png";
+        texPath += "road_tex.png";
         break;
 
         case CellType::INTER:
@@ -56,7 +56,7 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType t
 
         case CellType::GRASS:
         matName += "grassMat";
-        texPath += "grass_tex1.png";
+        texPath += "grass_tex.png";
         break;
 
         case CellType::CONCRETE:
@@ -83,11 +83,7 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType t
     m_pMat->SetDepthWrite(true);
 }
 
-Plane::~Plane()
-{
-}
-
-void Plane::render(glm::mat4 &mProj, const glm::mat4 &mView) const
+void Plane::render(glm::mat4 &mView, const glm::mat4 &mProj) const
 {
     m_pMat->SetUniform("projection", mProj);
     m_pMat->SetUniform("view", mView);

@@ -14,15 +14,14 @@ public:
     Grid(int width, int height);
     ~Grid();
 
-    void render(glm::mat4 &mProj, const glm::mat4 &mView) const;
+    void render(glm::mat4 &mView, const glm::mat4 &mProj) const;
     void renderImGui();
 
 private:
     void _fillBlock(const glm::vec3 &tl, const glm::vec3 &br);
     void _makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr);
 
-    static float bldgMinHeight;
-    static float bldgMaxHeight;
+    static int bldgMinLen;
 
     static float centreX;
     static float centreZ;
@@ -45,6 +44,8 @@ private:
 
     static float blockRoadWidthTrue;
     static float blockRoadLengthTrue;
+
+    int bldgDebugIndex = 0;
 
     Plane *m_pConcrete = nullptr;
 

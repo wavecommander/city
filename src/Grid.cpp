@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <vector>
 
 #include "glm/fwd.hpp"
@@ -14,8 +15,7 @@
 
 int buildingIDStart = 8;
 
-float Grid::bldgMinHeight = 15.0f;
-float Grid::bldgMaxHeight = 175.f;
+int Grid::bldgMinLen = 4;
 
 float Grid::centreX = 0.0f;
 float Grid::centreZ = 0.0f;
@@ -43,8 +43,6 @@ std::vector<VPAIR_T> plots;
 
 Grid::Grid(int length, int width)
 {
-    Building::setMinMaxHeight(bldgMinHeight, bldgMaxHeight);
-
     int numCitadelBlocks = (1 + 2 * extraCitadelBlockPaddingX) * (1 + 2 * extraCitadelBlockPaddingZ);
 
     // Both corners kept to allow for future changes
@@ -221,11 +219,63 @@ Grid::Grid(int length, int width)
 Grid::~Grid()
 {
     delete m_pConcrete;
+
+    std::unordered_set<void*> destroyedPtrs;
+
+    for (Building bldg : m_buildings) {
+
+        if(destroyedPtrs.find(bldg.m_pVB) != destroyedPtrs.end()) {
+            wolf::BufferManager::DestroyBuffer(bldg.m_pVB);
+            destroyedPtrs.insert(bldg.m_pVB);
+        }
+
+        if(destroyedPtrs.find(bldg.m_pDecl) != destroyedPtrs.end()) {
+            delete bldg.m_pDecl;
+            destroyedPtrs.insert(bldg.m_pDecl);
+        }
+
+        if(destroyedPtrs.find(bldg.m_pTex1) != destroyedPtrs.end()) {
+            wolf::TextureManager::DestroyTexture(bldg.m_pTex1);
+            destroyedPtrs.insert(bldg.m_pTex1);
+        }
+
+        if(destroyedPtrs.find(bldg.m_pTex2) != destroyedPtrs.end()) {
+            wolf::TextureManager::DestroyTexture(bldg.m_pTex2);
+            destroyedPtrs.insert(bldg.m_pTex2);
+        }
+
+        if(destroyedPtrs.find(bldg.m_pMat) != destroyedPtrs.end()) {
+            wolf::MaterialManager::DestroyMaterial(bldg.m_pMat);
+            destroyedPtrs.insert(bldg.m_pMat);
+        }
+    }
+
+    for (Plane plane : m_planes) {
+        if(destroyedPtrs.find(plane.m_pVB) != destroyedPtrs.end()) {
+            wolf::BufferManager::DestroyBuffer(plane.m_pVB);
+            destroyedPtrs.insert(plane.m_pVB);
+        }
+
+        if(destroyedPtrs.find(plane.m_pDecl) != destroyedPtrs.end()) {
+            delete plane.m_pDecl;
+            destroyedPtrs.insert(plane.m_pDecl);
+        }
+
+        if(destroyedPtrs.find(plane.m_pTex) != destroyedPtrs.end()) {
+            wolf::TextureManager::DestroyTexture(plane.m_pTex);
+            destroyedPtrs.insert(plane.m_pTex);
+        }
+
+        if(destroyedPtrs.find(plane.m_pMat) != destroyedPtrs.end()) {
+            wolf::MaterialManager::DestroyMaterial(plane.m_pMat);
+            destroyedPtrs.insert(plane.m_pMat);
+        }
+    }
 }
 
 void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
 {
-    int w = 8, l = 16;
+    int w = 16, l = 16;
 
     int nX = blockLength / w;
     int nZ = blockWidth / w;
@@ -248,24 +298,27 @@ void Grid::_fillBlock(const glm::vec3 &tl, const glm::vec3 &br)
 
 void Grid::_makeBldg(const glm::vec3 &ntl, const glm::vec3 &nbr)
 {
-    if (rand() % 5 >= 3) {
+    if (rand() % 3 != 0) {
         glm::vec3 nc = ntl + nbr;
         glm::vec3 center = glm::vec3(nc.x / 2.0f, nc.y / 2.0f, nc.z / 2.0f);
-        m_buildings.push_back(Building(center, nbr.x - ntl.x, nbr.z - ntl.z));
+
+        float length = wolf::randFloat(bldgMinLen, nbr.x - ntl.x);
+        float width = wolf::randFloat(bldgMinLen, nbr.z - ntl.z);
+        m_buildings.push_back(Building(center, length, width));
     }
 }
 
-void Grid::render(glm::mat4 &mProj, const glm::mat4 &mView) const
+void Grid::render(glm::mat4 &mView, const glm::mat4 &mProj) const
 {
     for (Building bldg : m_buildings) {
-        bldg.render(mProj, mView);
+        bldg.render(mView, mProj);
     }
 
     for (Plane plane : m_planes) {
-        plane.render(mProj, mView);
+        plane.render(mView, mProj);
     }
 
-    m_pConcrete->render(mProj, mView);
+    m_pConcrete->render(mView, mProj);
 }
 
 void Grid::renderImGui()
@@ -273,20 +326,20 @@ void Grid::renderImGui()
     if (!ImGui::CollapsingHeader("City Grid"))
         return;
 
+    float fltSpeed = 0.05f;
+
     ImGui::Text("Num Buildings: %lu", m_buildings.size());
     if (ImGui::CollapsingHeader("Buildings")) {
 
-        ImGui::DragFloat("Min Height", &bldgMinHeight);
-        ImGui::DragFloat("Max Height", &bldgMaxHeight);
-        ImGui::DragFloat("Height Spread", &Building::heightSpread);
+        ImGui::DragFloat("Height Spread", &Building::heightSpread, fltSpeed, 0.0f);
 
-        if (ImGui::BeginTable("Member Variables", 3)) {
+        ImGui::DragFloat3("Downtown Center (will affect future cities)", &Building::downtown.x, fltSpeed);
 
-        }
+        ImGui::Separator();
 
-        for (Building bldg : m_buildings) {
-            bldg.renderImGui();
-        }
+        ImGui::Text("Building Properties");
+        ImGui::DragInt("Selected Building ID", &bldgDebugIndex, 1.0f, 0, m_buildings.size() - 1);
+        m_buildings[bldgDebugIndex].renderImGui();
     }
 
     ImGui::Separator();
@@ -295,7 +348,7 @@ void Grid::renderImGui()
 
     ImGui::Separator();
 
-    if (ImGui::BeginTable("Member Variables", 3)) {
+    if (ImGui::BeginTable("Grid Member Variables", 3)) {
         int col = 0;
 
         ImGui::TableNextRow();
@@ -316,40 +369,33 @@ void Grid::renderImGui()
 
         float fltMin = -1000.0f;
         float fltMax = 1000.0f;
-        float fltStep = 0.01f;
-
-        ImGui::Button("Dummy");
 
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("bldgMinHeight", &bldgMinHeight, fltStep, fltMin, fltMax, "%.3f");
-        ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("bldgMaxHeight", &bldgMaxHeight, fltStep, fltMin, fltMax, "%.3f");
-        ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("centreX", &centreX, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("centreX", &centreX, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableNextRow();
 
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("centreZ", &centreZ, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("centreZ", &centreZ, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("cellSideLength", &cellSideLength, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("cellSideLength", &cellSideLength, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("roadWidth", &roadWidth, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("roadWidth", &roadWidth, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableNextRow();
 
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockWidthTrue", &blockWidthTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockWidthTrue", &blockWidthTrue, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockLengthTrue", &blockLengthTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockLengthTrue", &blockLengthTrue, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockWidthOffsetTrue", &blockWidthOffsetTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockWidthOffsetTrue", &blockWidthOffsetTrue, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableNextRow();
 
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockLengthOffsetTrue", &blockLengthOffsetTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockLengthOffsetTrue", &blockLengthOffsetTrue, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockRoadWidthTrue", &blockRoadWidthTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockRoadWidthTrue", &blockRoadWidthTrue, fltSpeed, fltMin, fltMax, "%.3f");
         ImGui::TableSetColumnIndex((col++) % 3);
-        ImGui::DragFloat("blockRoadLengthTrue", &blockRoadLengthTrue, fltStep, fltMin, fltMax, "%.3f");
+        ImGui::DragFloat("blockRoadLengthTrue", &blockRoadLengthTrue, fltSpeed, fltMin, fltMax, "%.3f");
 
         ImGui::EndTable();
     }

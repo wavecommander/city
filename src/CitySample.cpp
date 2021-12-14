@@ -241,11 +241,11 @@ void CitySample::render(int width, int height)
     // mWorldSkyscraper = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldSkyscraper;
     // m_pSkyscraper->Render(mWorldSkyscraper, mView, mProj);
 
-    m_pGrid->render(mProj, mView);
+    m_pGrid->render(mView, mProj);
 
-    m_pGrass->render(mProj, mView);
+    m_pGrass->render(mView, mProj);
 
-    m_pSkybox->render(mProj, mView);
+    m_pSkybox->render(mView, mProj);
 
     if (m_renderDebugUI)
         _renderImGui();
