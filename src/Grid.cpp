@@ -229,49 +229,49 @@ Grid::~Grid()
 
     for (Building bldg : m_buildings) {
 
-        if(destroyedPtrs.find(bldg.m_pVB) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(bldg.m_pVB) == destroyedPtrs.end()) {
             wolf::BufferManager::DestroyBuffer(bldg.m_pVB);
             destroyedPtrs.insert(bldg.m_pVB);
         }
 
-        if(destroyedPtrs.find(bldg.m_pDecl) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(bldg.m_pDecl) == destroyedPtrs.end()) {
             delete bldg.m_pDecl;
             destroyedPtrs.insert(bldg.m_pDecl);
         }
 
-        if(destroyedPtrs.find(bldg.m_pTex1) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(bldg.m_pTex1) == destroyedPtrs.end()) {
             wolf::TextureManager::DestroyTexture(bldg.m_pTex1);
             destroyedPtrs.insert(bldg.m_pTex1);
         }
 
-        if(destroyedPtrs.find(bldg.m_pTex2) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(bldg.m_pTex2) == destroyedPtrs.end()) {
             wolf::TextureManager::DestroyTexture(bldg.m_pTex2);
             destroyedPtrs.insert(bldg.m_pTex2);
         }
 
-        if(destroyedPtrs.find(bldg.m_pMat) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(bldg.m_pMat) == destroyedPtrs.end()) {
             wolf::MaterialManager::DestroyMaterial(bldg.m_pMat);
             destroyedPtrs.insert(bldg.m_pMat);
         }
     }
 
     for (Plane plane : m_planes) {
-        if(destroyedPtrs.find(plane.m_pVB) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(plane.m_pVB) == destroyedPtrs.end()) {
             wolf::BufferManager::DestroyBuffer(plane.m_pVB);
             destroyedPtrs.insert(plane.m_pVB);
         }
 
-        if(destroyedPtrs.find(plane.m_pDecl) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(plane.m_pDecl) == destroyedPtrs.end()) {
             delete plane.m_pDecl;
             destroyedPtrs.insert(plane.m_pDecl);
         }
 
-        if(destroyedPtrs.find(plane.m_pTex) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(plane.m_pTex) == destroyedPtrs.end()) {
             wolf::TextureManager::DestroyTexture(plane.m_pTex);
             destroyedPtrs.insert(plane.m_pTex);
         }
 
-        if(destroyedPtrs.find(plane.m_pMat) != destroyedPtrs.end()) {
+        if(destroyedPtrs.find(plane.m_pMat) == destroyedPtrs.end()) {
             wolf::MaterialManager::DestroyMaterial(plane.m_pMat);
             destroyedPtrs.insert(plane.m_pMat);
         }
