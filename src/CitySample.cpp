@@ -1,16 +1,17 @@
-#include <iostream>
-#include <math.h>
-#include <vector>
-
 #include <glm/fwd.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <irrKlang.h>
 
-#include "CitySample.h"
 #include "Grid.h"
+#include "Plane.h"
+#include "Skybox.h"
+#include "types.h"
 #include "utils.h"
+#include "CitySample.h"
+
+int CitySample::gridLength = 15;
+int CitySample::gridWidth = 15;
 
 CitySample::CitySample(wolf::App *pApp)
     : Sample(pApp, "Cityscape")
@@ -20,11 +21,14 @@ CitySample::CitySample(wolf::App *pApp)
 CitySample::~CitySample()
 {
     printf("Destroying City Sample\n");
-    wolf::MaterialManager::DestroyMaterial(m_pMat);
+    delete m_pCamera;
+
+    delete m_pGrid;
+
+    delete m_pSkybox;
+
     delete m_pCitadel;
     delete m_pCitadelPiece;
-
-    delete m_pCamera;
 
     if (m_pAudioEngine)
         m_pAudioEngine->drop();
@@ -35,14 +39,24 @@ void CitySample::init()
     if (!m_pCitadel) {
         m_renderDebugUI = false;
 
-        m_clearColor = ImVec4(0.45f, 0.55f, 0.6f, 1.0f);
-
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
+        _setCitadelToDefaultValues();
 
-        m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f);
+        // m_pHouse = new wolf::Model("data/house.fbx");
+        // m_pHouse1 = new wolf::Model("data/house1.fbx");
+        // m_pOffice = new wolf::Model("data/office.fbx");
+        // m_pFactory = new wolf::Model("data/factor.fbx");
+        // m_pSkyscraper = new wolf::Model("data/skyscraper.fbx");
 
-        m_shader = wolf::LoadShaders("data/default.vsh", "data/default.fsh");
+        m_pCamera = new FirstPersonCamera(m_pApp, glm::vec3(200.0f, 320.0f, -100.0f), glm::vec3(0.0f, 1.0f, 0.0f), -36.0f, 156.0f, glm::vec3(-10000.0f, 0.1f, -10000.0f), glm::vec3(10000.0f, 10000.0f, 10000.0f));
+
+        m_pGrid = new Grid(gridLength, gridWidth);
+
+        glm::vec3 tl = glm::vec3(-10000.0f, -10000.0f, -10000.0f);
+        m_pGrass = new Plane(tl, -tl, CellType::GRASS, tl.x / 100.0f, tl.x / 100.0f, -5.0f);
+
+        m_pSkybox = new Skybox();
     }
 
     printf("Successfully initialized City Sample\n");
@@ -65,58 +79,6 @@ void CitySample::goToSleep()
         m_pAudioEngine = nullptr;
     }
     m_time = 0.0f;
-}
-
-static constexpr float
-    TOTAL_PERIOD = 6.494, // Citadel should hammer down every 6.494s
-    PHASE_SHIFT = 1.0f, // Need offset to sync up with sound
-    DEFAULT_VALUE = 235.0f, // Start Y = 235.0f
-    TRANSLATION = -75.0f, // End Y = 160.0f
-    PULSE_WIDTH = 6.0f,
-    SLAM_FRACTION = 0.1f,
-    CITADEL_SCALE = 0.01f;
-
-float CitySample::_citadelPiecePulse(float t)
-{
-    if (t < SLAM_FRACTION * PULSE_WIDTH)
-        return DEFAULT_VALUE + TRANSLATION * t / (SLAM_FRACTION * PULSE_WIDTH);
-    return DEFAULT_VALUE + TRANSLATION * (PULSE_WIDTH - t) / ((1.0 - SLAM_FRACTION) * PULSE_WIDTH);
-}
-
-float CitySample::_calculateCitadelPieceHammer()
-{
-    float t = fmod(m_time + PHASE_SHIFT, TOTAL_PERIOD);
-    if (t > (TOTAL_PERIOD - PULSE_WIDTH))
-        return _citadelPiecePulse(t - TOTAL_PERIOD + PULSE_WIDTH);
-    return DEFAULT_VALUE;
-}
-
-void CitySample::_renderImGui()
-{
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::Begin("City Sample Debug Menu");
-
-    ImGui::Checkbox("Demo Window", &m_showDemoWindow);
-    if (m_showDemoWindow)
-        ImGui::ShowDemoWindow(&m_showDemoWindow);
-
-    ImGui::Separator();
-
-    ImGui::Text("m_time %f", m_time);
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-    ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
-
-    ImGui::Separator();
-
-    m_pCamera->renderImGui();
-
-    ImGui::End();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void CitySample::_handle_keys()
@@ -143,6 +105,76 @@ void CitySample::_handle_keys()
     }
 }
 
+void CitySample::_renderImGui()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("City Sample Debug Menu");
+
+    ImGui::Checkbox("Demo Window", &m_showDemoWindow);
+    if (m_showDemoWindow)
+        ImGui::ShowDemoWindow(&m_showDemoWindow);
+
+    ImGui::Separator();
+
+    ImGui::Text("m_time %f", m_time);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    ImGui::ColorEdit3("glClearColor", (float *)&m_clearColor);
+
+    ImGui::DragInt("Grid Length", &gridLength, 0.5f);
+    ImGui::DragInt("Grid Width", &gridWidth, 0.5f);
+
+    m_pCamera->renderImGui();
+
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("Citadel")) {
+        ImGui::DragFloat("Scale", &m_citadelScale, 0.0001, 0.0f, 1.0f, "%.4f");
+        ImGui::DragFloat("Total Period", &m_citadelTotalPeriod, 0.01, 0.0f, 10.0f, "%.2f");
+        ImGui::DragFloat("Phase Shift", &m_citadelPhaseShift, 0.01, 0.0f, 2.0f, "%.2f");
+        ImGui::DragFloat("Pulse Width", &m_citadelPulseWidth, 0.01, 0.0f, 10.0f, "%.2f");
+        ImGui::DragFloat("Slam Fraction", &m_citadelSlamFraction, 0.01, 0.0f, 1.0f, "%.2f");
+        if(ImGui::Button("Reset")) _setCitadelToDefaultValues();
+    }
+
+    ImGui::Separator();
+
+    m_pGrid->renderImGui();
+
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+float CitySample::_citadelPiecePulse(float t) const
+{
+    if (t < m_citadelSlamFraction * m_citadelPulseWidth)
+        return m_citadelStartingYValue + m_citadelTranslation * t / (m_citadelSlamFraction * m_citadelPulseWidth);
+    return m_citadelStartingYValue + m_citadelTranslation * (m_citadelPulseWidth - t) / ((1.0 - m_citadelSlamFraction) * m_citadelPulseWidth);
+}
+
+float CitySample::_calculateCitadelPieceHammer() const
+{
+    float t = fmod(m_time + m_citadelPhaseShift, m_citadelTotalPeriod);
+    if (t > (m_citadelTotalPeriod - m_citadelPulseWidth))
+        return _citadelPiecePulse(t - m_citadelTotalPeriod + m_citadelPulseWidth);
+    return m_citadelStartingYValue;
+}
+
+void CitySample::_setCitadelToDefaultValues()
+{
+    m_citadelScale = 0.01f;
+    m_citadelTotalPeriod = 6.494; // Citadel should hammer down every 6.494s
+    m_citadelPhaseShift = 1.0f; // Need offset to sync up with sound
+    m_citadelStartingYValue = (23500.0f * m_citadelScale);
+    m_citadelTranslation = (-7500.0f * m_citadelScale);
+    m_citadelPulseWidth = 6.0f;
+    m_citadelSlamFraction = 0.1f;
+}
+
 void CitySample::update(float dt)
 {
     _handle_keys();
@@ -159,10 +191,14 @@ void CitySample::update(float dt)
         m_pCamera->updateMousePosition(); // this fixes the camera angle changing wildly with the mouse pos upon toggling debug UI
         m_pApp->setCaptureCursor(false);
     }
+
+    m_citadelStartingYValue = (23500.0f * m_citadelScale);
+    m_citadelTranslation = (-7500.0f * m_citadelScale);
 }
 
 void CitySample::render(int width, int height)
 {
+    glEnable(GL_DEPTH_TEST);
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -170,16 +206,45 @@ void CitySample::render(int width, int height)
     glm::mat4 mView = m_pCamera->getViewMatrix();
 
     // Render the Citadel, minus the moving piece
-    glm::mat4 mWorldCitadel = glm::rotate(glm::mat4(1.0f), -PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
-    mWorldCitadel = glm::scale(mWorldCitadel, glm::vec3(CITADEL_SCALE, CITADEL_SCALE, CITADEL_SCALE));
+    glm::mat4 mWorldCitadel = glm::rotate(glm::mat4(1.0f), PI / 2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    mWorldCitadel = glm::scale(mWorldCitadel, glm::vec3(m_citadelScale, m_citadelScale, m_citadelScale));
     m_pCitadel->Render(mWorldCitadel, mView, mProj);
 
     // Render the moving piece of Citadel
-    glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI / 2, glm::vec3(1.0f, 0.0f, 0.0f));
-    mWorldCitadelPiece = glm::scale(mWorldCitadelPiece, glm::vec3(CITADEL_SCALE, CITADEL_SCALE, CITADEL_SCALE));
+    glm::mat4 mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), -PI / 2.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     mWorldCitadelPiece = glm::rotate(glm::mat4(1.0f), PI / 2.5f, glm::vec3(0.0f, 1.0f, 0.0f)) * mWorldCitadelPiece;
-    mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3(2.50f, _calculateCitadelPieceHammer(), -10.0f)) * mWorldCitadelPiece;
+    mWorldCitadelPiece = glm::scale(mWorldCitadelPiece, glm::vec3(m_citadelScale, m_citadelScale, m_citadelScale));
+    mWorldCitadelPiece = glm::translate(glm::mat4(1.0f), glm::vec3((250.0f * m_citadelScale), _calculateCitadelPieceHammer(), (-1000.0f * m_citadelScale))) * mWorldCitadelPiece;
     m_pCitadelPiece->Render(mWorldCitadelPiece, mView, mProj);
+
+
+    // CODE FOR TRANSFOMRING IMPORTED MODELS
+    // glm::mat4 mWorldHouse = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    // mWorldHouse = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 0.0f, 100.0f)) * mWorldHouse;
+    // m_pHouse->Render(mWorldHouse, mView, mProj);
+
+    // glm::mat4 mWorldHouse1 = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    // mWorldHouse1 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldHouse1;
+    // m_pHouse1->Render(mWorldHouse1, mView, mProj);
+
+    // glm::mat4 mWorldOffice = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    // mWorldOffice = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldOffice;
+    // m_pOffice->Render(mWorldOffice, mView, mProj);
+
+    // glm::mat4 mWorldFactory = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    // mWorldFactory = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldFactory;
+    // m_pFactory->Render(mWorldFactory, mView, mProj);
+
+    // glm::mat4 mWorldSkyscraper = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    // mWorldSkyscraper = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * mWorldSkyscraper;
+    // m_pSkyscraper->Render(mWorldSkyscraper, mView, mProj);
+
+    m_pGrid->render(mView, mProj);
+
+    m_pGrass->render(mView, mProj);
+
+    // couldn't get skybox to work on time
+    // m_pSkybox->render(mView, mProj);
 
     if (m_renderDebugUI)
         _renderImGui();
