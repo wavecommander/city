@@ -6,7 +6,7 @@
 
 Build the project using CMake and run the `city` executable.
 
-Occaisionally segfaults on initialisation; keep trying and it will start.
+~~Occaisionally segfaults on initialisation; keep trying and it will start.~~ (should be fixed as of [4c0b2fa](https://github.com/wavecommander/city/commit/4c0b2fa50d90bfbff66020dfd3ad9154d2ad2390))
 
 ## Keyboard Controls
 
@@ -29,6 +29,6 @@ Things to try in the debug menu:
 
 * Select an individual building and change its dimensions and position
 
-* Change the 'downtown' point so future cities will have its talles buildings concentrated somewhere other than (0,0, 0).
+* Change the 'downtown' point so future cities will have its tallest buildings concentrated somewhere other than (0,0,0)
 
 * Change the Citadel scale and animation function parameters
