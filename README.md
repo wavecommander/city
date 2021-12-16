@@ -12,7 +12,7 @@ Build the project using CMake and run the `city` executable.
 
 ~~Occaisionally segfaults on initialisation; keep trying and it will start.~~ (should be fixed as of [4c0b2fa](https://github.com/wavecommander/city/commit/4c0b2fa50d90bfbff66020dfd3ad9154d2ad2390))
 
-## Keyboard Controls
+## Controls
 
 | Key(s) | Function                                                      |
 |--------|:--------------------------------------------------------------|
