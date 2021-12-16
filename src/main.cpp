@@ -1,7 +1,7 @@
-#include <iostream>
-#include <stdio.h>
+#include <random>
+#include <time.h>
 
-#include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -99,6 +99,8 @@ private:
 
 int main(int, char **)
 {
+    srand(time(NULL));
+
     City city;
     city.run();
 }

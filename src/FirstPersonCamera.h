@@ -1,26 +1,25 @@
 #ifndef S_FPS_CAMERA_H
 #define S_FPS_CAMERA_H
 
+#include <glm/fwd.hpp>
 #include "../wolf/wolf.h"
-#include <glm/glm.hpp>
 
 class FirstPersonCamera
 {
 public:
-    FirstPersonCamera(wolf::App *pApp, const glm::vec3 &position, const glm::vec3 &up, float rotX = DEF_ROT_X, float rotY = DEF_ROT_Y);
+    FirstPersonCamera(wolf::App *pApp, const glm::vec3 &position, const glm::vec3 &up, float rotX = DEF_ROT_X, float rotY = DEF_ROT_Y, const glm::vec3 &minPosition = glm::vec3(-10000.0f,0.0f,-10000.0f), const glm::vec3 &maxPosition = glm::vec3(10000.0f,5000.0f,10000.0f));
     ~FirstPersonCamera() { }
 
-    void focusOn(const glm::vec3 &min, const glm::vec3 &max);
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjMatrix(int width, int height) const;
-    std::string toString() const;
 
     void update(float dt);
     void updateMousePosition();
     void renderImGui();
 
 private:
-    void _limit_fov();
+    void _limitPosition();
+    void _limitFOV();
     void _processMouseMovement();
     void _processMouseScroll();
     void _processKeyboardMovement(float dt);
@@ -32,6 +31,9 @@ private:
     glm::vec3 m_front = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 m_right = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    glm::vec3 m_minPosition = glm::vec3(-1000000000000.0f,-1000000000000.0f,-1000000000000.0f);
+    glm::vec3 m_maxPosition = glm::vec3(1000000000000.0f,1000000000000.0f,1000000000000.0f);
 
     bool m_wasSprinting = false;
 
@@ -47,7 +49,7 @@ private:
         FOV_STEP = 0.05f,
         MAX_FOV = 1.5f,
         MIN_FOV = 0.01f,
-        NEAR_PLANE = 0.1f,
+        NEAR_PLANE = 0.01f,
         FAR_PLANE = 100000.0f;
 
     float m_rotX = 0.0f;

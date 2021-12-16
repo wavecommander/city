@@ -1,6 +1,6 @@
 TFILE="$(basename $0).$$.tmp"
 mkdir -p profiles/
-renderdoccmd capture -d . -c profiles/$TFILE -w build/sample && renderdoc profiles/$TFILE*
+/home/benb/dev/graphics/zrenderdoc/bin/renderdoccmd capture -d . -c profiles/$TFILE -w build/city && /home/benb/dev/graphics/zrenderdoc/bin/qrenderdoc profiles/$TFILE*
 
 while true; do
     read -p "Do you want to keep this profile? " yn
