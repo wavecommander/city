@@ -25,6 +25,7 @@ public:
 private:
     void _init(const glm::vec3 &position);
     void _reinit();
+    void _generateVertices();
     void _destroyAll();
     float _calculateHeight() const;
 
@@ -32,13 +33,14 @@ private:
     static constexpr int ROOF_CUTOFF = NUM_VERTS - 6;
     static constexpr int NUM_TEXTURES = 3;
 
-    static float minUV, maxUV;
+    static float minU, maxU;
 
     float m_length;
     float m_width;
     float m_height;
 
-    float m_uv = 1.0f;
+    float m_u = 1.0f;
+    float m_v = 1.0f;
 
     glm::vec3 m_position = glm::vec3(0.0f,0.0f,0.0f);
 

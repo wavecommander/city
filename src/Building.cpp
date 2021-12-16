@@ -10,8 +10,8 @@ float Building::minHeight = 15.0f;
 float Building::maxHeight = 180.0f;
 float Building::heightSpread = 30.0f;
 
-float Building::minUV = 1.0f;
-float Building::maxUV = 1.75f;
+float Building::minU = 1.0f;
+float Building::maxU = 1.75f;
 
 glm::vec3 Building::downtown = glm::vec3(0.0f,0.0f,0.0f);
 
@@ -53,8 +53,14 @@ void Building::_init(const glm::vec3 &position)
     m_height = _calculateHeight();
     m_position.y += (m_height / 2.0f);
 
-    m_uv = wolf::randFloat(minUV, maxUV);
+    m_u = wolf::max(m_height / 40.0f, 1.0f);
+    m_v = wolf::randFloat(minU, maxU);
 
+    _generateVertices();
+}
+
+void Building::_generateVertices()
+{
     Vertex vertices[NUM_VERTS];
 
     // texture for front, back, left, right faces
@@ -64,16 +70,16 @@ void Building::_init(const glm::vec3 &position)
         vertices[i] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, 0.0f};
 
         idx = (i+1) * 3;
-        vertices[i+1] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, m_uv};
+        vertices[i+1] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 0.0f, m_v};
 
         idx = (i+2) * 3;
-        vertices[i+2] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_uv, m_uv};
+        vertices[i+2] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_u, m_v};
 
         idx = (i+3) * 3;
         vertices[i+3] = vertices[i+2];
 
         idx = (i+4) * 3;
-        vertices[i+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_uv, 0.0f};
+        vertices[i+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_u, 0.0f};
 
         idx = (i+5) * 3;
         vertices[i+5] = vertices[i];
@@ -163,8 +169,14 @@ void Building::renderImGui()
 
     ImGui::Text("Properties that require reinitialization");
 
-    ImGui::DragFloat("Min UV", &minUV, fltSpeed);
-    ImGui::DragFloat("Max UV", &maxUV, fltSpeed);
+    ImGui::DragFloat("U", &m_u, fltSpeed);
+    ImGui::DragFloat("V", &m_v, fltSpeed);
+    ImGui::DragFloat("Min U", &minU, fltSpeed);
+    ImGui::DragFloat("Max V", &maxU, fltSpeed);
+
+    if(ImGui::Button("Recalculate Vertices")) {
+        _generateVertices();
+    }
 
     if(ImGui::Button("Reinitialze")) {
         _reinit();
