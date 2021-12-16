@@ -25,6 +25,8 @@ CitySample::~CitySample()
 
     delete m_pGrid;
 
+    delete m_pGrass;
+
     delete m_pSkybox;
 
     delete m_pCitadel;
