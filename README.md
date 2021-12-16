@@ -2,13 +2,15 @@
 
 ## Ben Boyle 117501 - CS 4350 Fall 2021
 
+![](city-preview.png)
+
 I only claim ownership of the code in the `src` directory; all other code and assets belong to their respective authors.
 
 ## Building and Running
 
 Build the project using CMake and run the `city` executable.
 
-~~Occaisionally segfaults on initialisation; keep trying and it will start.~~ (should be fixed as of https://github.com/wavecommander/city/commit/4c0b2fa50d90bfbff66020dfd3ad9154d2ad2390)
+~~Occaisionally segfaults on initialisation; keep trying and it will start.~~ (should be fixed as of [4c0b2fa](https://github.com/wavecommander/city/commit/4c0b2fa50d90bfbff66020dfd3ad9154d2ad2390))
 
 ## Keyboard Controls
 
