@@ -67,14 +67,16 @@ void FirstPersonCamera::_processKeyboardMovement(float dt)
         velocity *= SPRINT_FACTOR;
 
         if (!m_wasSprinting) {
+            m_prior_FOV = m_fov;
             m_fov += SPRINT_FOV;
             _limitFOV();
         }
 
         m_wasSprinting = true;
+
     } else {
         if (m_wasSprinting) {
-            m_fov -= SPRINT_FOV;
+            m_fov = m_prior_FOV;
             _limitFOV();
             m_wasSprinting = false;
         }

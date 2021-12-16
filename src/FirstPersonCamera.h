@@ -25,18 +25,6 @@ private:
     void _processKeyboardMovement(float dt);
     void _updateCameraVectors();
 
-    wolf::App *m_pApp;
-
-    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 m_front = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 m_right = glm::vec3(0.0f, 0.0f, -1.0f);
-
-    glm::vec3 m_minPosition = glm::vec3(-1000000000000.0f,-1000000000000.0f,-1000000000000.0f);
-    glm::vec3 m_maxPosition = glm::vec3(1000000000000.0f,1000000000000.0f,1000000000000.0f);
-
-    bool m_wasSprinting = false;
-
     static constexpr float
         DEF_ROT_Y = 0.0f,
         DEF_ROT_X = 0.0f,
@@ -58,6 +46,19 @@ private:
     float m_mouseSens = MOUSE_SENS;
     glm::vec2 m_lastMousePos;
     float m_fov = DEF_FOV;
+
+    float m_prior_FOV = DEF_FOV;
+    bool m_wasSprinting = false;
+
+    wolf::App *m_pApp;
+
+    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 m_front = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 m_right = glm::vec3(0.0f, 0.0f, -1.0f);
+
+    glm::vec3 m_minPosition = glm::vec3(-1000000000000.0f,-1000000000000.0f,-1000000000000.0f);
+    glm::vec3 m_maxPosition = glm::vec3(1000000000000.0f,1000000000000.0f,1000000000000.0f);
 };
 
 #endif // S_FPS_CAMERA_H
