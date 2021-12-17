@@ -41,6 +41,10 @@ void CitySample::init()
     if (!m_pCitadel) {
         m_renderDebugUI = false;
 
+        for (int i = 0; i < NUM_KEYS; ++i) {
+            m_pressedKeys[i] = false;
+        }
+
         m_pCitadel = new wolf::Model("data/citadel_trimmed.fbx");
         m_pCitadelPiece = new wolf::Model("data/citadel_piece.fbx");
         _setCitadelToDefaultValues();
