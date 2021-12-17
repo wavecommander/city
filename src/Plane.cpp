@@ -72,9 +72,12 @@ Plane::Plane(const glm::vec3 &topLeft, const glm::vec3 &bottomRight,  CellType t
     }
 
     m_pTex = wolf::TextureManager::CreateTexture(texPath);
-    m_pTex->SetWrapMode(wolf::Texture::WM_Repeat);
 
-    if(type == CellType::ROAD_X || type == CellType::ROAD_Z) m_pTex->SetWrapMode(wolf::Texture::WM_MirroredRepeat);
+    if(type == CellType::ROAD_X || type == CellType::ROAD_Z) {
+        m_pTex->SetWrapMode(wolf::Texture::WM_MirroredRepeat);
+    } else {
+        m_pTex->SetWrapMode(wolf::Texture::WM_Repeat);
+    }
 
     m_pMat = wolf::MaterialManager::CreateMaterial(matName);
     m_pMat->SetTexture("tex", m_pTex);
@@ -89,7 +92,7 @@ void Plane::render(glm::mat4 &mView, const glm::mat4 &mProj) const
     m_pMat->SetUniform("view", mView);
     m_pMat->Apply();
 
-	m_pDecl->Bind();
+    m_pDecl->Bind();
 
-	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTS);
 }

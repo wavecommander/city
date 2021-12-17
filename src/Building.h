@@ -33,11 +33,11 @@ private:
     static constexpr int ROOF_CUTOFF = NUM_VERTS - 6;
     static constexpr int NUM_TEXTURES = 3;
 
-    static float minU, maxU;
-
     float m_length;
     float m_width;
     float m_height;
+
+    static float uFactor, vFactor, minU, minV;
 
     float m_u = 1.0f;
     float m_v = 1.0f;

@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include "glm/fwd.hpp"
 #include "types.h"
 #include "Building.h"
 
@@ -10,16 +9,18 @@ float Building::minHeight = 15.0f;
 float Building::maxHeight = 180.0f;
 float Building::heightSpread = 30.0f;
 
+float Building::uFactor = 40.0f;
+float Building::vFactor = 25.0f;
 float Building::minU = 1.0f;
-float Building::maxU = 1.75f;
+float Building::minV = 1.0f;
 
 glm::vec3 Building::downtown = glm::vec3(0.0f,0.0f,0.0f);
 
 constexpr GLfloat Building::CUBE_VERTS[];
 
 Building::Building(const glm::vec3 &position, int length, int width)
-    :m_length(length)
-    ,m_width(width)
+    : m_length(length)
+    , m_width(width)
 {
     _init(position);
 }
@@ -53,8 +54,8 @@ void Building::_init(const glm::vec3 &position)
     m_height = _calculateHeight();
     m_position.y += (m_height / 2.0f);
 
-    m_u = wolf::max(m_height / 40.0f, 1.0f);
-    m_v = wolf::randFloat(minU, maxU);
+    m_u = wolf::max(m_height / uFactor, minU);
+    m_v = wolf::max(m_width / vFactor, minV);
 
     _generateVertices();
 }
@@ -75,13 +76,11 @@ void Building::_generateVertices()
         idx = (i+2) * 3;
         vertices[i+2] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_u, m_v};
 
-        idx = (i+3) * 3;
         vertices[i+3] = vertices[i+2];
 
         idx = (i+4) * 3;
         vertices[i+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], m_u, 0.0f};
 
-        idx = (i+5) * 3;
         vertices[i+5] = vertices[i];
     }
 
@@ -103,7 +102,6 @@ void Building::_generateVertices()
     idx += 3;
     vertices[st+4] = Vertex {CUBE_VERTS[idx], CUBE_VERTS[idx+1], CUBE_VERTS[idx+2], 1.0f, 0.0f};
 
-    idx += 3;
     vertices[st+5] = vertices[st];
 
     m_pVB = wolf::BufferManager::CreateVertexBuffer(vertices, sizeof(Vertex) * NUM_VERTS);
@@ -127,17 +125,17 @@ void Building::render(glm::mat4 &mView, const glm::mat4 &mProj) const
     m_pMat->SetTexture("tex", m_pTex1);
     m_pMat->Apply();
 
-	m_pDecl->Bind();
+    m_pDecl->Bind();
 
-	glDrawArrays(GL_TRIANGLES, 0, ROOF_CUTOFF);
+    glDrawArrays(GL_TRIANGLES, 0, ROOF_CUTOFF);
 
     // top gravel texture
     m_pMat->SetTexture("tex", m_pTex2);
     m_pMat->Apply();
 
-	m_pDecl->Bind();
+    m_pDecl->Bind();
 
-	glDrawArrays(GL_TRIANGLES, ROOF_CUTOFF, 6);
+    glDrawArrays(GL_TRIANGLES, ROOF_CUTOFF, 6);
 }
 
 void Building::_destroyAll() // dangerous, should only be used for quick dirty debugging
@@ -151,13 +149,13 @@ void Building::_destroyAll() // dangerous, should only be used for quick dirty d
 
 void Building::_reinit() // dangerous, should only be used for quick dirty debugging
 {
-        _destroyAll();
-        _init(glm::vec3(m_position.x, m_position.y - (m_height / 2.0f), m_position.z));
+    _destroyAll();
+    _init(glm::vec3(m_position.x, m_position.y - (m_height / 2.0f), m_position.z));
 }
 
 void Building::renderImGui()
 {
-    float fltSpeed = 0.1;
+    float fltSpeed = 0.2;
 
     ImGui::DragFloat("Length", &m_length, fltSpeed, 0.0f);
     ImGui::DragFloat("Width", &m_width, fltSpeed, 0.0f);
@@ -167,12 +165,10 @@ void Building::renderImGui()
 
     ImGui::Separator();
 
-    ImGui::Text("Properties that require reinitialization");
+    ImGui::Text("Properties that require regenerating vertices");
 
     ImGui::DragFloat("U", &m_u, fltSpeed);
     ImGui::DragFloat("V", &m_v, fltSpeed);
-    ImGui::DragFloat("Min U", &minU, fltSpeed);
-    ImGui::DragFloat("Max V", &maxU, fltSpeed);
 
     if(ImGui::Button("Recalculate Vertices")) {
         _generateVertices();
