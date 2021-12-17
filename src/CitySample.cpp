@@ -13,6 +13,8 @@
 int CitySample::gridLength = 15;
 int CitySample::gridWidth = 15;
 
+float CitySample::m_citadelAlarmVolume = 0.25f;
+
 CitySample::CitySample(wolf::App *pApp)
     : Sample(pApp, "Cityscape")
 {
@@ -76,6 +78,7 @@ void CitySample::_initAudio()
         return;
     }
     m_pAudioEngine->play2D("data/citadel_alert_cut.ogg", true);
+    m_pAudioEngine->setSoundVolume(m_citadelAlarmVolume);
 }
 
 void CitySample::goToSleep()
@@ -138,6 +141,7 @@ void CitySample::_renderImGui()
     ImGui::Separator();
 
     if (ImGui::CollapsingHeader("Citadel")) {
+        ImGui::DragFloat("Alarm Volume", &m_citadelAlarmVolume, 0.001, 0.0f, 1.0f, "%.4f");
         ImGui::DragFloat("Scale", &m_citadelScale, 0.0001, 0.0f, 1.0f, "%.4f");
         ImGui::DragFloat("Total Period", &m_citadelTotalPeriod, 0.01, 0.0f, 10.0f, "%.2f");
         ImGui::DragFloat("Phase Shift", &m_citadelPhaseShift, 0.01, 0.0f, 2.0f, "%.2f");
@@ -187,6 +191,8 @@ void CitySample::update(float dt)
 
     if (!m_pAudioEngine)
         _initAudio(); // moved init here to deal with audio syncing problem; shouldn't be too bad with branch prediction
+
+    m_pAudioEngine->setSoundVolume(m_citadelAlarmVolume);
 
     m_time += dt;
 

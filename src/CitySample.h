@@ -25,8 +25,8 @@ public:
 
 private:
     void _initAudio();
-    void _renderImGui();
     void _handle_keys();
+    void _renderImGui();
     float _calculateCitadelPieceHammer() const;
     float _citadelPiecePulse(float t) const;
     void _setCitadelToDefaultValues();
@@ -54,6 +54,8 @@ private:
     // wolf::Model *m_pOffice = nullptr;
     // wolf::Model *m_pFactory = nullptr;
     // wolf::Model *m_pSkyscraper = nullptr;
+
+    static float m_citadelAlarmVolume;
 
     float m_citadelScale;
     float m_citadelTotalPeriod;
