@@ -8,7 +8,7 @@ I only claim ownership of the code in the `src` directory; all other code and as
 
 ## Building and Running
 
-Build the project using CMake and run the `city` executable.
+Build the project using CMake and **run the `city` executable from the repo root directory so that `data` is in PATH**; failure to do so will cause a crash on startup.
 
 ~~Occaisionally segfaults on initialisation; keep trying and it will start.~~ (should be fixed as of [4c0b2fa](https://github.com/wavecommander/city/commit/4c0b2fa50d90bfbff66020dfd3ad9154d2ad2390))
 
