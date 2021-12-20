@@ -55,7 +55,7 @@ private:
     // wolf::Model *m_pFactory = nullptr;
     // wolf::Model *m_pSkyscraper = nullptr;
 
-    static float m_citadelAlarmVolume;
+    static float citadelAlarmVolume;
 
     float m_citadelScale;
     float m_citadelTotalPeriod;
