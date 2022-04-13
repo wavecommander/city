@@ -38,7 +38,7 @@ private:
         MAX_FOV = 1.5f,
         MIN_FOV = 0.01f,
         NEAR_PLANE = 0.01f,
-        FAR_PLANE = 100000.0f;
+        FAR_PLANE = 3000.0f;
 
     float m_rotX = 0.0f;
     float m_rotY = 0.0f;
