@@ -178,7 +178,7 @@ void CitySample::_setCitadelToDefaultValues()
 {
     m_citadelScale = 0.01f;
     m_citadelTotalPeriod = 6.494; // Citadel should hammer down every 6.494s
-    m_citadelPhaseShift = 1.0f; // Need offset to sync up with sound
+    m_citadelPhaseShift = 0.5f; // Need offset to sync up with sound
     m_citadelStartingYValue = (23500.0f * m_citadelScale);
     m_citadelTranslation = (-7500.0f * m_citadelScale);
     m_citadelPulseWidth = 6.0f;
