@@ -26,8 +26,8 @@ private:
     void _updateCameraVectors();
 
     static constexpr float
-        DEF_ROT_Y = 0.0f,
         DEF_ROT_X = 0.0f,
+        DEF_ROT_Y = 0.0f,
         MAX_ROT = 89.9f,
         DEF_SPEED = 50.0f,
         SPRINT_FACTOR = 6.0f,

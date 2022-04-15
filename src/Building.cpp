@@ -133,8 +133,6 @@ void Building::render(glm::mat4 &mView, const glm::mat4 &mProj) const
     m_pMat->SetTexture("tex", m_pTex2);
     m_pMat->Apply();
 
-    m_pDecl->Bind();
-
     glDrawArrays(GL_TRIANGLES, ROOF_CUTOFF, 6);
 }
 
