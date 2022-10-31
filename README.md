@@ -1,4 +1,4 @@
-# City Final Assigment
+# City Final Assignment
 
 ## Ben Boyle 117501 - CS 4350 Fall 2021
 
