@@ -62,7 +62,7 @@ void CitySample::init()
         m_pGrid = new Grid(gridLength, gridWidth);
 
         glm::vec3 tl = glm::vec3(-10000.0f, -10000.0f, -10000.0f);
-        m_pGrass = new Plane(tl, -tl, CellType::GRASS, tl.x / 100.0f, tl.x / 100.0f, -5.0f);
+        m_pGrass = new Plane(tl, -tl, CellType::GRASS, tl.x / 100.0f, tl.x / 100.0f, -10.0f);
 
         m_pSkybox = new Skybox();
     }
